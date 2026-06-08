@@ -1,6 +1,6 @@
 ---
 name: llm-council
-description: Multi-LLM collaborative brainstorming and planning. Use when user explicitly requests consultation with multiple AI models (ChatGPT, Gemini, other LLMs) before presenting an implementation plan, or asks to "consult the council", "ask other models", or "get perspectives from other AIs". Queries external LLM APIs, synthesizes their perspectives, and presents an adapted implementation plan.
+description: Multi-LLM collaborative brainstorming and planning. Use when user explicitly requests consultation with multiple AI models (ChatGPT, Gemini, other LLMs) before presenting an implementation plan, or asks to "consult the council", "ask the council", "ask ChatGPT and Gemini", "ask other models", or "get perspectives from other AIs". Queries external LLM APIs, synthesizes their perspectives, and presents an adapted implementation plan.
 ---
 
 # LLM Council
@@ -10,7 +10,9 @@ Consult multiple AI models (ChatGPT and Gemini) for their perspectives before pr
 ## Workflow
 
 When user requests consultation with other AI models, use phrases like:
+- "Consult the council: [your question]"
 - "Consult with ChatGPT and Gemini about..."
+- "Ask ChatGPT and Gemini what they think about..."
 - "Ask other AI models what they think about..."
 - "Get perspectives from the council on..."
 - "Consult the LLM council: [your question]"
@@ -59,16 +61,57 @@ Higher-tier models provide more sophisticated analysis but cost more per API cal
 
 If the `.env` file doesn't exist or keys are missing, inform the user and provide setup instructions.
 
-## Usage Example
+## Usage Examples
 
-**User input:** "Consult the council: How should I architect a real-time data pipeline for IoT sensors?"
+### Example 1: Microservices Architecture
+
+**User input:** "Consult the council: How should I architect a microservices system?"
 
 **Claude's process:**
-1. Execute: `python3 scripts/query_llms.py "How should I architect a real-time data pipeline for IoT sensors?"`
+1. Execute: `python3 scripts/query_llms.py "How should I architect a microservices system?"`
 2. Parse JSON responses from ChatGPT and Gemini
-3. Analyze their suggestions (e.g., ChatGPT suggests Kafka, Gemini recommends considering edge computing)
-4. Synthesize final plan incorporating valuable insights from all models
-5. Present the adapted plan to user with attribution
+3. Analyze their suggestions and synthesize with Claude's own analysis
+4. Present the adapted plan with attribution
+
+**Sample synthesized output:**
+
+> Based on consultation with ChatGPT and Gemini, here's the recommended microservices architecture:
+>
+> **Service Decomposition** — ChatGPT emphasized decomposing by business capability (not technical function), recommending Domain-Driven Design (DDD) as the primary decomposition strategy. Gemini echoed this and added the importance of defining bounded contexts before drawing service boundaries.
+>
+> **Communication patterns** — Both models agreed on using async messaging (e.g., Kafka or RabbitMQ) for event-driven workflows and synchronous REST/gRPC only for real-time queries. Gemini specifically warned against chatty synchronous chains across more than 2 hops.
+>
+> **Data isolation** — ChatGPT strongly recommended the Database-per-Service pattern; Gemini suggested starting with logical isolation (separate schemas) before full physical separation to reduce operational overhead early on.
+>
+> **Observability** — Both recommended distributed tracing (OpenTelemetry), centralized logging, and a service mesh (Istio or Linkerd) once the service count exceeds ~5.
+>
+> **Key contributions:**
+> - ChatGPT: DDD decomposition strategy, API gateway pattern, circuit breaker with Resilience4j
+> - Gemini: bounded context warnings, phased data isolation approach, service mesh timing advice
+
+---
+
+### Example 2: Database Design
+
+**User input:** "Ask ChatGPT and Gemini what they think about my database design"
+
+**Claude's process:**
+1. Execute: `python3 scripts/query_llms.py "[paste your schema or describe the design]"`
+2. Parse and compare both models' feedback on the schema
+3. Synthesize a prioritized list of improvements
+4. Present findings with attribution
+
+**Sample synthesized output:**
+
+> After consulting ChatGPT and Gemini on your database design:
+>
+> **Normalization** — Both flagged potential denormalization in the `orders` table. ChatGPT recommended extracting `shipping_address` into its own table to support address reuse; Gemini agreed but noted that for read-heavy workloads, a controlled denormalization with a materialized view may be preferable.
+>
+> **Indexing** — ChatGPT suggested composite indexes on `(user_id, created_at)` for the most common query pattern. Gemini added that `status` columns with low cardinality are poor standalone index candidates and work better in composite indexes.
+>
+> **Key contributions:**
+> - ChatGPT: normalization advice, index strategy, foreign key constraints
+> - Gemini: read-vs-write tradeoffs, query pattern analysis, partitioning considerations
 
 ## Output Format
 
