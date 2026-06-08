@@ -126,10 +126,15 @@ Both OpenAI and Gemini APIs have usage costs that vary significantly by model:
 ```
 llm-council/
 ├── SKILL.md                    # Main skill instructions
+├── .env.template               # Copy to .env and add your API keys
 ├── scripts/
-│   └── query_llms.py          # Python script that queries both APIs
+│   ├── query_llms.py          # Python script that queries both APIs
+│   └── run_evals.py           # Eval runner with benchmark support
+├── evals/
+│   ├── eval_prompts.json      # 10 test cases (trigger, output-quality, error-handling)
+│   └── grading_criteria.md   # 6-dimension grading rubric (18 points total)
 └── references/
-    └── setup.md               # Detailed setup instructions
+    └── SETUP.md               # Detailed setup instructions
 ```
 
 ## Troubleshooting
