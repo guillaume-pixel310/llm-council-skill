@@ -51,11 +51,29 @@ llm-council/          ← skill source (this is what gets packaged)
     SETUP.md          ← API key setup instructions
 llm-council.skill     ← ZIP of llm-council/ — the installable artifact
 README.md             ← user-facing docs with install and usage examples
+.claude/
+  settings.json       ← project hooks (PostToolUse ZIP rebuild, PreToolUse secrets guard)
+  rebuild-skill.sh    ← called by PostToolUse after Edit/Write; rebuilds ZIP when llm-council/ changes
+  secrets-guard.sh    ← called by PreToolUse before Read; blocks reads of .env files
+.gitignore            ← excludes .env, __pycache__, .pyc, .DS_Store
 ```
 
 ### Critical invariant: keep the ZIP in sync
 
 `llm-council.skill` is a ZIP archive of the `llm-council/` directory. A `PostToolUse` hook in `.claude/settings.json` auto-rebuilds it whenever you edit a file inside `llm-council/` via Claude Code's Edit or Write tools. If you edit files outside Claude Code (e.g., directly in an editor), run the rebuild command manually.
+
+### Hooks (`.claude/settings.json`)
+
+Two hooks run automatically in every Claude Code session:
+
+| Hook | Trigger | What it does |
+|------|---------|--------------|
+| `rebuild-skill.sh` | PostToolUse on Edit/Write | Rebuilds `llm-council.skill` ZIP if edited file is inside `llm-council/` |
+| `secrets-guard.sh` | PreToolUse on Read | Blocks reads of `.env` (exit 2) to prevent live API keys entering LLM context |
+
+### Security gotcha: Gemini API key must go in a header, not the URL
+
+The Google Generative Language API accepts the key two ways: `?key=...` in the URL or `x-goog-api-key` header. **Always use the header.** The URL form exposes the key in HTTP server logs, reverse proxy logs, and `requests` exception messages. The correct call is in `query_gemini()` at `llm-council/scripts/query_llms.py`.
 
 ### How `query_llms.py` works
 
