@@ -14,7 +14,7 @@ import sys
 import json
 import shutil
 import subprocess
-from typing import Dict, Optional, Tuple
+from typing import Dict, Tuple
 import requests
 
 
@@ -83,7 +83,7 @@ def query_codex_cli(prompt: str, timeout: int = 60) -> Tuple[bool, str]:
         return False, f"codex exception: {str(e)}"
 
 
-def query_openai(prompt: str, api_key: str, model: str = "gpt-5-nano") -> Optional[str]:
+def query_openai(prompt: str, api_key: str, model: str = "gpt-5-nano") -> str:
     """Query OpenAI's ChatGPT API."""
     try:
         response = requests.post(
@@ -108,7 +108,7 @@ def query_openai(prompt: str, api_key: str, model: str = "gpt-5-nano") -> Option
 
 def query_gemini(
     prompt: str, api_key: str, model: str = "gemini-3-flash-preview"
-) -> Optional[str]:
+) -> str:
     """Query Google's Gemini API."""
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
