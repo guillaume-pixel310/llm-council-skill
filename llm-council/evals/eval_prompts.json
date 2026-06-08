@@ -1,0 +1,124 @@
+{
+  "skill": "llm-council",
+  "version": "1.0",
+  "description": "Evaluation cases for the llm-council skill. Each case defines a user prompt, whether the skill should trigger, and what the synthesized output must contain.",
+  "cases": [
+    {
+      "id": "trigger-01",
+      "category": "trigger-recognition",
+      "prompt": "Consult the council: How should I architect a microservices system?",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Executes scripts/query_llms.py with the microservices question",
+        "Parses JSON responses from both ChatGPT and Gemini",
+        "Synthesizes a response covering service decomposition, communication, and data isolation",
+        "Attributes insights to ChatGPT and Gemini by name"
+      ]
+    },
+    {
+      "id": "trigger-02",
+      "category": "trigger-recognition",
+      "prompt": "Ask ChatGPT and Gemini what they think about my database design",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Executes scripts/query_llms.py with the database design question",
+        "Requests clarification or uses placeholder if no schema is provided",
+        "Synthesizes feedback on normalization, indexing, and schema structure",
+        "Attributes specific recommendations to each model"
+      ]
+    },
+    {
+      "id": "trigger-03",
+      "category": "trigger-recognition",
+      "prompt": "Get perspectives from the council on whether to use REST or GraphQL",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Executes scripts/query_llms.py with the REST vs GraphQL question",
+        "Synthesizes tradeoffs from both models' perspectives",
+        "Presents a recommendation based on synthesized consensus"
+      ]
+    },
+    {
+      "id": "trigger-04",
+      "category": "trigger-recognition",
+      "prompt": "Consult the LLM council: What's the best approach for caching in a distributed system?",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Executes scripts/query_llms.py with the caching question",
+        "Covers cache invalidation strategies, TTL, and cache topology",
+        "Attributes distinct perspectives to ChatGPT and Gemini"
+      ]
+    },
+    {
+      "id": "no-trigger-01",
+      "category": "trigger-recognition",
+      "prompt": "How should I architect a microservices system?",
+      "should_trigger": false,
+      "expected_behaviors": [
+        "Does NOT invoke the llm-council skill",
+        "Answers directly from Claude's own knowledge"
+      ]
+    },
+    {
+      "id": "no-trigger-02",
+      "category": "trigger-recognition",
+      "prompt": "What do you think about my database design?",
+      "should_trigger": false,
+      "expected_behaviors": [
+        "Does NOT invoke the llm-council skill",
+        "Answers directly without querying external LLMs"
+      ]
+    },
+    {
+      "id": "output-01",
+      "category": "output-quality",
+      "prompt": "Consult the council: Should I use PostgreSQL or MongoDB for my SaaS app?",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Output has clear section headers or logical structure",
+        "Both ChatGPT and Gemini are named at least once each",
+        "Output includes a concrete recommendation or decision framework",
+        "Key contributions section lists what each model contributed",
+        "Response is actionable, not just a list of generic tradeoffs"
+      ]
+    },
+    {
+      "id": "output-02",
+      "category": "output-quality",
+      "prompt": "Ask other AI models what they think about using event sourcing for my e-commerce platform",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Covers event store choice, snapshot strategy, and eventual consistency",
+        "Attributes at least one concrete pattern or tool to ChatGPT",
+        "Attributes at least one concrete pattern or tool to Gemini",
+        "Synthesis goes beyond simple summarization — identifies where models agree/disagree"
+      ]
+    },
+    {
+      "id": "error-01",
+      "category": "error-handling",
+      "prompt": "Consult the council: What's the best message queue for high throughput?",
+      "should_trigger": true,
+      "simulated_error": "OPENAI_API_KEY not set",
+      "expected_behaviors": [
+        "Informs user that ChatGPT's perspective is unavailable",
+        "Still presents Gemini's perspective",
+        "Offers to provide Claude's own analysis as supplement",
+        "Does NOT crash or produce an empty response"
+      ]
+    },
+    {
+      "id": "error-02",
+      "category": "error-handling",
+      "prompt": "Consult the council: How do I handle distributed transactions?",
+      "should_trigger": true,
+      "simulated_error": "Both API keys missing",
+      "expected_behaviors": [
+        "Informs user that both external models are unavailable",
+        "Provides setup instructions for .env file",
+        "Offers to answer with Claude's own analysis",
+        "Does NOT produce empty output"
+      ]
+    }
+  ]
+}
