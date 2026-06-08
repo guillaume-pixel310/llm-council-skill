@@ -55,7 +55,7 @@ README.md             ← user-facing docs with install and usage examples
 
 ### Critical invariant: keep the ZIP in sync
 
-`llm-council.skill` is a ZIP archive of the `llm-council/` directory. **Every time you edit any file inside `llm-council/`, you must rebuild the ZIP.** The rebuild command is above. If you forget, users install a stale skill.
+`llm-council.skill` is a ZIP archive of the `llm-council/` directory. A `PostToolUse` hook in `.claude/settings.json` auto-rebuilds it whenever you edit a file inside `llm-council/` via Claude Code's Edit or Write tools. If you edit files outside Claude Code (e.g., directly in an editor), run the rebuild command manually.
 
 ### How `query_llms.py` works
 
