@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conseil des 9 Agents</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F9F8F5;
+  --surface: #FFFFFF;
+  --surface2: #F1EFE8;
+  --border: rgba(0,0,0,0.1);
+  --border2: rgba(0,0,0,0.2);
+  --text: #1a1a18;
+  --text2: #5F5E5A;
+  --text3: #888780;
+  --purple: #534AB7; --purple-bg: #EEEDFE; --purple-text: #3C3489;
+  --teal: #0F6E56; --teal-bg: #E1F5EE; --teal-text: #085041;
+  --blue: #185FA5; --blue-bg: #E6F1FB; --blue-text: #0C447C;
+  --coral: #993C1D; --coral-bg: #FAECE7; --coral-text: #712B13;
+  --amber: #854F0B; --amber-bg: #FAEEDA; --amber-text: #633806;
+  --pink: #993556; --pink-bg: #FBEAF0; --pink-text: #72243E;
+  --green: #3B6D11; --green-bg: #EAF3DE; --green-text: #27500A;
+  --red: #A32D2D; --red-bg: #FCEBEB; --red-text: #791F1F;
+  --gray: #5F5E5A; --gray-bg: #F1EFE8; --gray-text: #444441;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+body {
+  font-family: 'Georgia', serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--text3);
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 2rem;
+  letter-spacing: 0.02em;
+}
+
+/* API key banner */
+.api-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--amber-bg);
+  border: 1px solid var(--amber);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 1.5rem;
+  font-size: 12px;
+  font-family: 'Arial', sans-serif;
+  color: var(--amber-text);
+}
+.api-banner input {
+  flex: 1;
+  font-size: 12px;
+  font-family: monospace;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+}
+.api-banner input:focus { border-color: var(--purple); }
+.api-banner button {
+  font-size: 11px;
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: var(--amber-text);
+  color: var(--surface);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.api-banner.has-key { background: var(--teal-bg); border-color: var(--teal); color: var(--teal-text); }
+.api-banner.has-key button { background: var(--teal); }
+
+/* proxy note */
+.proxy-note {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 1rem;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.proxy-note a { color: var(--blue); }
+
+.question-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+textarea {
+  flex: 1;
+  min-height: 80px;
+  font-size: 14px;
+  font-family: 'Arial', sans-serif;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+}
+textarea:focus { border-color: var(--purple); }
+
+.controls { display: flex; flex-direction: column; gap: 8px; }
+
+.btn-main {
+  background: var(--text);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 13px;
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.btn-main:hover { background: #333; }
+.btn-main:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 12px;
+  font-family: 'Arial', sans-serif;
+  cursor: pointer;
+  color: var(--text2);
+}
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+.progress-track {
+  height: 3px;
+  background: var(--surface2);
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.agent-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 14px 12px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.agent-card.state-thinking { border-color: var(--amber); border-width: 2px; }
+.agent-card.state-done { border-color: var(--teal); border-width: 1.5px; }
+.agent-card.state-forced { border-color: var(--red); border-width: 1.5px; }
+
+.agent-header { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.agent-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.agent-name { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; font-family: 'Arial', sans-serif; color: var(--text); }
+.agent-role { font-size: 11px; color: var(--text3); font-family: 'Arial', sans-serif; line-height: 1.4; margin-bottom: 8px; }
+
+.status-badge {
+  font-size: 10px;
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  display: inline-block;
+  text-transform: uppercase;
+}
+.st-idle { background: var(--surface2); color: var(--text3); }
+.st-thinking { background: var(--amber-bg); color: var(--amber-text); }
+.st-done { background: var(--teal-bg); color: var(--teal-text); }
+.st-forced { background: var(--red-bg); color: var(--red-text); }
+
+.force-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 10px;
+  font-family: 'Arial', sans-serif;
+  padding: 3px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text2);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.agent-card:hover .force-btn { opacity: 1; }
+.force-btn:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tab {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: 'Arial', sans-serif;
+  cursor: pointer;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab.active { color: var(--text); border-bottom-color: var(--text); }
+.tab:hover:not(.active) { color: var(--text); }
+.tab-count {
+  font-size: 10px;
+  background: var(--surface2);
+  border-radius: 99px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  color: var(--text3);
+}
+
+.stream {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+  font-family: 'Arial', sans-serif;
+  font-style: italic;
+}
+
+.msg {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  animation: slide-in 0.3s ease;
+}
+.msg:last-child { border-bottom: none; }
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.msg-icon { font-size: 16px; }
+.msg-name { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; font-family: 'Arial', sans-serif; }
+.msg-type {
+  font-size: 10px;
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+.type-agent { background: var(--blue-bg); color: var(--blue-text); }
+.type-forced { background: var(--red-bg); color: var(--red-text); }
+.type-contra { background: var(--amber-bg); color: var(--amber-text); }
+.type-synthesis { background: var(--gray-bg); color: var(--gray-text); }
+
+.msg-body {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text);
+  font-family: 'Arial', sans-serif;
+}
+.msg-body strong { font-weight: 700; }
+
+.synthesis-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 20px;
+}
+.synthesis-panel h2 {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.synthesis-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+  font-family: 'Arial', sans-serif;
+}
+.synthesis-body strong { font-weight: 700; }
+
+@media (max-width: 600px) {
+  .agents-grid { grid-template-columns: 1fr 1fr; }
+  body { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<h1>Conseil des 9 Agents</h1>
+<p class="subtitle">CHAMBRE DÉLIBÉRATIVE — CHAQUE AGENT DÉFEND SA DISCIPLINE — LE DÉBAT PRODUIT LA VÉRITÉ LA PLUS ABOUTIE</p>
+
+<!-- FIX 1+2: API key stored in localStorage; CORS note displayed when key is set -->
+<div class="api-banner" id="api-banner">
+  <span>Clé API Anthropic :</span>
+  <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+  <button onclick="saveApiKey()">Enregistrer</button>
+  <span style="opacity:0.7">Stockée localement dans votre navigateur</span>
+</div>
+<div class="proxy-note" id="proxy-note">
+  ⚠️ Les appels directs au navigateur sont bloqués par CORS. Déployez un
+  <a href="https://developers.cloudflare.com/workers/" target="_blank">proxy Cloudflare Worker</a>
+  ou un serveur Express devant cette page, puis définissez <code>window.PROXY_URL</code>.
+</div>
+
+<div class="question-area">
+  <textarea id="question" placeholder="Soumettez votre question au Conseil... Stratégie, business, structure, décision complexe."></textarea>
+  <div class="controls">
+    <button class="btn-main" id="launch-btn" onclick="launchDebate()">Convoquer le Conseil →</button>
+    <button class="btn-ghost" onclick="resetAll()">Réinitialiser</button>
+  </div>
+</div>
+
+<div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+<div class="agents-grid" id="agents-grid"></div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-debate" onclick="switchTab('debate')">Débat <span class="tab-count" id="count">0</span></div>
+  <div class="tab" id="tab-synthesis" onclick="switchTab('synthesis')">Verdict final</div>
+</div>
+
+<div id="panel-debate">
+  <div class="stream" id="stream">
+    <div class="empty-state">Le Conseil attend votre question</div>
+  </div>
+</div>
+
+<div id="panel-synthesis" style="display:none">
+  <div class="synthesis-panel">
+    <h2><i class="ti ti-crown"></i> Verdict de l'Arbitre</h2>
+    <div class="synthesis-body" id="synthesis-body">
+      <p style="color:var(--text3);font-style:italic">La synthèse apparaîtra après le débat complet</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const MODEL = 'claude-sonnet-4-6'; // FIX 3: updated from retired claude-sonnet-4-20250514
+
+const AGENTS = [
+  {
+    id: 'strategist', icon: 'ti-chess', name: 'STRATÈGE', role: 'Vision systémique, position concurrentielle, timing', color: 'purple',
+    persona: `Tu es un stratège de haut niveau (ex-McKinsey, war room). Tu analyses les forces en présence, le timing stratégique, les leviers de position durable. Tu penses en systèmes, en scénarios, en avantages concurrentiels. Tu es synthétique et tranchant. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'financier', icon: 'ti-coin', name: 'FINANCIER', role: 'P&L, cash flow, ROI, structuration patrimoniale', color: 'teal',
+    persona: `Tu es un directeur financier senior avec expertise Luxembourg (SOPARFI, Article 166 LIR, fiscalité, holdings). Tu examines tout sous l'angle des chiffres, du cash, de l'optimisation fiscale, du risque financier. Chiffres concrets obligatoires. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'juriste', icon: 'ti-scale', name: 'JURISTE', role: 'Risques légaux, contrats, conformité, structure', color: 'blue',
+    persona: `Tu es un avocat d'affaires expérimenté. Tu identifies les risques juridiques, les failles contractuelles, les problèmes de conformité et les structures légales optimales. Tu es précis, tu cites les textes pertinents, tu identifies les pièges. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'marketeur', icon: 'ti-speakerphone', name: 'MARKETEUR', role: 'Positionnement, brand, acquisition, désirabilité', color: 'coral',
+    persona: `Tu es un directeur marketing avec expérience luxe et premium. Tu analyses le positionnement, la désirabilité, l'acquisition client, la narration de marque. Tu penses en territoires émotionnels et en conversion. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'ops', icon: 'ti-settings', name: 'OPS / EXÉCUTION', role: 'Faisabilité, process, ressources, délais réels', color: 'amber',
+    persona: `Tu es un COO aguerri. Tu testes la faisabilité réelle, les goulots d'étranglement, les ressources nécessaires, les délais honnêtes. Tu déconstruis les plans trop optimistes avec des contraintes concrètes et opérationnelles. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'psycho', icon: 'ti-brain', name: 'PSYCHOLOGUE', role: 'Dynamiques humaines, décision, biais, comportements', color: 'pink',
+    persona: `Tu es un psychologue organisationnel et comportementaliste. Tu analyses les dynamiques humaines, les biais cognitifs, les patterns décisionnels, les résistances, les motivations profondes. Tu vois ce que les autres ratent dans la dimension humaine. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'innovateur', icon: 'ti-bulb', name: 'INNOVATEUR', role: 'Rupture, tendances, ce qui n\'existe pas encore', color: 'green',
+    persona: `Tu es un innovateur radical. Tu regardes ce qui n'existe pas encore, les ruptures possibles, les convergences de tendances, les analogies avec d'autres secteurs. Tu challenges le statu quo systématiquement. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'contradicteur', icon: 'ti-flame', name: 'CONTRADICTEUR', role: 'Avocat du diable, failles, scénarios d\'échec', color: 'red',
+    persona: `Tu es l'avocat du diable absolu. Ton rôle est d'identifier les failles, les angles morts, les raisons pour lesquelles ça va échouer, les hypothèses non vérifiées. Tu es incisif, tu ne ménages pas. Tu forces les autres à répondre à leurs angles morts. Utilise les marqueurs **FAILLE MAJEURE**, **SCÉNARIO D'ÉCHEC**, **CE QU'ON ÉVITE DE DIRE**.`
+  },
+  {
+    id: 'arbitre', icon: 'ti-crown', name: 'ARBITRE', role: 'Synthèse finale, décision, verdict actionnable', color: 'gray',
+    persona: `Tu es le Président du Conseil. Ton rôle est de produire la synthèse définitive après avoir entendu tous les agents. Tu identifies les consensus, les tensions non résolues, les angles morts collectifs. Tu formules une RECOMMANDATION FINALE claire, actionnale et hiérarchisée. Tu tranches.`
+  }
+];
+
+const COLOR_MAP = {
+  purple: { icon: '#534AB7', bg: '#EEEDFE', text: '#3C3489' },
+  teal:   { icon: '#0F6E56', bg: '#E1F5EE', text: '#085041' },
+  blue:   { icon: '#185FA5', bg: '#E6F1FB', text: '#0C447C' },
+  coral:  { icon: '#993C1D', bg: '#FAECE7', text: '#712B13' },
+  amber:  { icon: '#854F0B', bg: '#FAEEDA', text: '#633806' },
+  pink:   { icon: '#993556', bg: '#FBEAF0', text: '#72243E' },
+  green:  { icon: '#3B6D11', bg: '#EAF3DE', text: '#27500A' },
+  red:    { icon: '#A32D2D', bg: '#FCEBEB', text: '#791F1F' },
+  gray:   { icon: '#5F5E5A', bg: '#F1EFE8', text: '#444441' }
+};
+
+let agentStates = {};
+let messages = [];
+let debateRunning = false;
+
+// FIX 1: API key management via localStorage
+function loadApiKey() {
+  const key = localStorage.getItem('conseil_api_key') || '';
+  const input = document.getElementById('api-key-input');
+  const banner = document.getElementById('api-banner');
+  if (key) {
+    input.value = key;
+    banner.classList.add('has-key');
+    banner.querySelector('span').textContent = '✓ Clé API enregistrée';
+    document.getElementById('proxy-note').style.display = 'block';
+  }
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) return;
+  localStorage.setItem('conseil_api_key', key);
+  const banner = document.getElementById('api-banner');
+  banner.classList.add('has-key');
+  banner.querySelector('span').textContent = '✓ Clé API enregistrée';
+  document.getElementById('proxy-note').style.display = 'block';
+}
+
+function getApiKey() {
+  return localStorage.getItem('conseil_api_key') || '';
+}
+
+function init() {
+  AGENTS.forEach(a => { agentStates[a.id] = 'idle'; });
+  renderGrid();
+  loadApiKey();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('agents-grid');
+  grid.innerHTML = AGENTS.map(a => {
+    const st = agentStates[a.id];
+    const c = COLOR_MAP[a.color];
+    let cardClass = 'agent-card';
+    if (st === 'thinking') cardClass += ' state-thinking';
+    else if (st === 'done') cardClass += ' state-done';
+    else if (st === 'forced') cardClass += ' state-forced';
+    let stLabel = 'En attente'; let stClass = 'st-idle';
+    if (st === 'thinking') { stLabel = 'Réflexion…'; stClass = 'st-thinking'; }
+    else if (st === 'done') { stLabel = 'Position défendue'; stClass = 'st-done'; }
+    else if (st === 'forced') { stLabel = 'Forcé'; stClass = 'st-forced'; }
+    return `<div class="${cardClass}" id="card-${a.id}">
+      <button class="force-btn" onclick="forceAgent('${a.id}')" title="Forcer cet agent à prendre position">Forcer →</button>
+      <div class="agent-header">
+        <i class="ti ${a.icon} agent-icon" style="color:${c.icon}"></i>
+        <div><div class="agent-name">${a.name}</div></div>
+      </div>
+      <div class="agent-role">${a.role}</div>
+      <span class="status-badge ${stClass}" id="status-${a.id}">${stLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+function setAgentState(id, st) {
+  agentStates[id] = st;
+  const card = document.getElementById(`card-${id}`);
+  const badge = document.getElementById(`status-${id}`);
+  if (!card || !badge) return;
+  card.className = 'agent-card' + (st === 'thinking' ? ' state-thinking' : st === 'done' ? ' state-done' : st === 'forced' ? ' state-forced' : '');
+  if (st === 'thinking') { badge.className = 'status-badge st-thinking'; badge.textContent = 'Réflexion…'; }
+  else if (st === 'done')   { badge.className = 'status-badge st-done';    badge.textContent = 'Position défendue'; }
+  else if (st === 'forced') { badge.className = 'status-badge st-forced';  badge.textContent = 'Forcé'; }
+  else                      { badge.className = 'status-badge st-idle';    badge.textContent = 'En attente'; }
+}
+
+function addMsg(agentId, content, type, forced) {
+  messages.push({ agentId, content, type, forced });
+  renderStream();
+  document.getElementById('count').textContent = messages.filter(m => m.type !== 'synthesis').length;
+}
+
+// FIX 4: escape HTML entities before applying markdown-to-HTML transforms
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function fmt(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p style="margin-top:8px">')
+    .replace(/\n/g, '<br>');
+}
+
+function renderStream() {
+  const stream = document.getElementById('stream');
+  if (!messages.length) {
+    stream.innerHTML = '<div class="empty-state">Le Conseil attend votre question</div>';
+    return;
+  }
+  stream.innerHTML = messages.map(m => {
+    // FIX 6: guard against unknown agentId
+    const a = AGENTS.find(x => x.id === m.agentId);
+    if (!a) return '';
+    const c = COLOR_MAP[a.color];
+    let typeClass = 'type-agent'; let typeLabel = 'Position';
+    if (m.forced)                  { typeClass = 'type-forced';    typeLabel = 'Forcé'; }
+    else if (m.type === 'synthesis'){ typeClass = 'type-synthesis'; typeLabel = 'Verdict'; }
+    else if (a.id === 'contradicteur'){ typeClass = 'type-contra'; typeLabel = 'Contradiction'; }
+    return `<div class="msg">
+      <div class="msg-header">
+        <i class="ti ${a.icon} msg-icon" style="color:${c.icon}"></i>
+        <span class="msg-name" style="color:${c.icon}">${a.name}</span>
+        <span class="msg-type ${typeClass}">${typeLabel}</span>
+      </div>
+      <div class="msg-body"><p>${fmt(m.content)}</p></div>
+    </div>`;
+  }).join('');
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function setProgress(pct) {
+  document.getElementById('progress').style.width = Math.round(pct) + '%';
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-debate').className   = tab === 'debate'    ? 'tab active' : 'tab';
+  document.getElementById('tab-synthesis').className = tab === 'synthesis' ? 'tab active' : 'tab';
+  document.getElementById('panel-debate').style.display    = tab === 'debate'    ? '' : 'none';
+  document.getElementById('panel-synthesis').style.display = tab === 'synthesis' ? '' : 'none';
+}
+
+// FIX 1+2: send x-api-key; use window.PROXY_URL if set (for CORS)
+async function callClaude(prompt) {
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error('Clé API manquante — entrez votre clé sk-ant-... ci-dessus');
+
+  const endpoint = (window.PROXY_URL || 'https://api.anthropic.com') + '/v1/messages';
+
+  const r = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: MODEL, // FIX 3
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!r.ok) {
+    let msg = `HTTP ${r.status}`;
+    try { const d = await r.json(); msg = d.error?.message || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+
+  const d = await r.json();
+  if (d.content && d.content[0]) return d.content[0].text;
+  throw new Error(d.error?.message || 'Réponse API inattendue');
+}
+
+// FIX 7 (removed async — pure string concat, no await needed)
+function buildAgentPrompt(agent, question, prevMessages) {
+  // FIX 8: cap history to last 4 messages to limit O(n²) token growth
+  const recent = prevMessages.slice(-4);
+  const history = recent.map(m => {
+    const a = AGENTS.find(x => x.id === m.agentId);
+    return a ? `[${a.name}]: ${m.content}` : '';
+  }).filter(Boolean).join('\n\n');
+
+  return `QUESTION SOUMISE AU CONSEIL:\n"${question}"\n\n` +
+    (history ? `POSITIONS RÉCENTES:\n${history}\n\n` : '') +
+    `INSTRUCTIONS:\nTu es ${agent.name}. ${agent.persona}\n\n` +
+    `Ton intervention (max 200 mots):\n` +
+    `1. Défends TA position disciplinaire avec des arguments précis et tranchants\n` +
+    `2. Identifie UN ANGLE que les autres ont raté (s'il y a des positions précédentes)\n` +
+    `3. Pointe une contradiction dans une position précédente si tu en vois une\n` +
+    `4. Conclus par TA RECOMMANDATION spécifique\n\n` +
+    `Sois dense, précis, direct. Pas de politesse excessive.`;
+}
+
+// FIX 7 (removed async — pure string concat)
+function buildSynthesisPrompt(question, allMessages) {
+  const history = allMessages.map(m => {
+    const a = AGENTS.find(x => x.id === m.agentId);
+    return a ? `[${a.name}${m.forced ? ' — FORCÉ' : ''}]: ${m.content}` : '';
+  }).filter(Boolean).join('\n\n');
+
+  return `QUESTION SOUMISE AU CONSEIL:\n"${question}"\n\n` +
+    `DÉBAT COMPLET DES 8 AGENTS:\n${history}\n\n` +
+    `Tu es l'ARBITRE FINAL. Produis la synthèse définitive (max 300 mots):\n\n` +
+    `**CONSENSUS** — Points sur lesquels tous convergent\n` +
+    `**TENSIONS NON RÉSOLUES** — Désaccords structurels entre agents\n` +
+    `**ANGLES MORTS COLLECTIFS** — Ce que personne n'a suffisamment traité\n` +
+    `**VERDICT FINAL** — 3 actions prioritaires numérotées, actionnables immédiatement\n` +
+    `**MISE EN GARDE** — Le risque principal à surveiller\n\n` +
+    `Sois tranchant, synthétique, immédiatement utilisable.`;
+}
+
+async function launchDebate() {
+  const question = document.getElementById('question').value.trim();
+  if (!question) { document.getElementById('question').focus(); return; }
+  if (debateRunning) return;
+
+  debateRunning = true;
+  messages = [];
+  AGENTS.forEach(a => { agentStates[a.id] = 'idle'; });
+  renderGrid();
+  renderStream();
+  setProgress(0);
+  document.getElementById('launch-btn').disabled = true;
+  document.getElementById('synthesis-body').innerHTML = '<p style="color:var(--text3);font-style:italic">Délibération en cours…</p>';
+  switchTab('debate');
+
+  const debateAgents = AGENTS.filter(a => a.id !== 'arbitre');
+
+  for (let i = 0; i < debateAgents.length; i++) {
+    const agent = debateAgents[i];
+    setAgentState(agent.id, 'thinking');
+    setProgress((i / debateAgents.length) * 80);
+    try {
+      const prompt = buildAgentPrompt(agent, question, messages); // FIX 7: no await needed
+      const content = await callClaude(prompt);
+      addMsg(agent.id, content, agent.id === 'contradicteur' ? 'contradiction' : 'agent', false);
+      setAgentState(agent.id, 'done');
+    } catch(e) {
+      addMsg(agent.id, `Erreur : ${e.message}`, 'agent', false);
+      setAgentState(agent.id, 'done');
+    }
+    setProgress(((i + 1) / debateAgents.length) * 80);
+    // removed artificial 300ms sleep
+  }
+
+  setAgentState('arbitre', 'thinking');
+  setProgress(88);
+
+  try {
+    const sPrompt = buildSynthesisPrompt(question, messages); // FIX 7: no await needed
+    const synthesis = await callClaude(sPrompt);
+    addMsg('arbitre', synthesis, 'synthesis', false);
+    setAgentState('arbitre', 'done');
+    document.getElementById('synthesis-body').innerHTML = `<p>${fmt(synthesis)}</p>`;
+  } catch(e) {
+    addMsg('arbitre', `Erreur : ${e.message}`, 'synthesis', false);
+    setAgentState('arbitre', 'done');
+  }
+
+  setProgress(100);
+  debateRunning = false;
+  document.getElementById('launch-btn').disabled = false;
+  switchTab('synthesis');
+}
+
+async function forceAgent(agentId) {
+  if (debateRunning) return;
+  // FIX 9: prevent forcing an agent that already has a response
+  if (agentStates[agentId] === 'done' || agentStates[agentId] === 'forced') {
+    if (!confirm(`${AGENTS.find(a=>a.id===agentId)?.name} a déjà pris position. Forcer une nouvelle intervention ?`)) return;
+  }
+
+  const question = document.getElementById('question').value.trim();
+  if (!question) { alert('Entrez d\'abord une question.'); return; }
+
+  const agent = AGENTS.find(a => a.id === agentId);
+  if (!agent) return; // FIX 6
+
+  debateRunning = true;
+  document.getElementById('launch-btn').disabled = true;
+  setAgentState(agentId, 'thinking');
+  switchTab('debate');
+
+  try {
+    const prompt = buildAgentPrompt(agent, question, messages); // FIX 7
+    const content = await callClaude(prompt);
+    addMsg(agentId, content, 'agent', true);
+    setAgentState(agentId, 'forced');
+  } catch(e) {
+    addMsg(agentId, `Erreur : ${e.message}`, 'agent', true);
+    setAgentState(agentId, 'forced');
+  } finally {
+    // FIX 5: always restore UI state even if an unexpected error is thrown
+    debateRunning = false;
+    document.getElementById('launch-btn').disabled = false;
+  }
+}
+
+function resetAll() {
+  if (debateRunning) return;
+  messages = [];
+  AGENTS.forEach(a => { agentStates[a.id] = 'idle'; });
+  renderGrid();
+  renderStream();
+  setProgress(0);
+  document.getElementById('question').value = '';
+  document.getElementById('synthesis-body').innerHTML = '<p style="color:var(--text3);font-style:italic">La synthèse apparaîtra après le débat complet</p>';
+  document.getElementById('count').textContent = '0';
+  switchTab('debate');
+}
+
+init();
+</script>
+</body>
+</html>
