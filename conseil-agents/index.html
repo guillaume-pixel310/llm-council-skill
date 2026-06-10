@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conseil des 9 Agents</title>
+<title>Conseil des 10 Agents</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,6 +26,7 @@
   --green: #3B6D11; --green-bg: #EAF3DE; --green-text: #27500A;
   --red: #A32D2D; --red-bg: #FCEBEB; --red-text: #791F1F;
   --gray: #5F5E5A; --gray-bg: #F1EFE8; --gray-text: #444441;
+  --indigo: #3730A3; --indigo-bg: #EEF2FF; --indigo-text: #312E81;
   --radius: 10px;
   --radius-sm: 6px;
 }
@@ -175,7 +176,7 @@ textarea:focus { border-color: var(--purple); }
 
 .agents-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-bottom: 2rem;
 }
@@ -295,6 +296,7 @@ textarea:focus { border-color: var(--purple); }
 .type-forced { background: var(--red-bg); color: var(--red-text); }
 .type-contra { background: var(--amber-bg); color: var(--amber-text); }
 .type-synthesis { background: var(--gray-bg); color: var(--gray-text); }
+.type-politique { background: var(--indigo-bg); color: var(--indigo-text); }
 
 .msg-body {
   font-size: 13px;
@@ -328,7 +330,7 @@ textarea:focus { border-color: var(--purple); }
 }
 .synthesis-body strong { font-weight: 700; }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .agents-grid { grid-template-columns: 1fr 1fr; }
   body { padding: 1rem; }
 }
@@ -336,8 +338,8 @@ textarea:focus { border-color: var(--purple); }
 </head>
 <body>
 
-<h1>Conseil des 9 Agents</h1>
-<p class="subtitle">CHAMBRE DÉLIBÉRATIVE — CHAQUE AGENT DÉFEND SA DISCIPLINE — LE DÉBAT PRODUIT LA VÉRITÉ LA PLUS ABOUTIE</p>
+<h1>Conseil des 10 Agents</h1>
+<p class="subtitle">CHAMBRE DÉLIBÉRATIVE — DIX DISCIPLINES EN FRICTION — LE DÉBAT PRODUIT LA VÉRITÉ LA PLUS ABOUTIE</p>
 
 <!-- FIX 1+2: API key stored in localStorage; CORS note displayed when key is set -->
 <div class="api-banner" id="api-banner">
@@ -397,8 +399,33 @@ const AGENTS = [
     persona: `Tu es un directeur financier senior avec expertise Luxembourg (SOPARFI, Article 166 LIR, fiscalité, holdings). Tu examines tout sous l'angle des chiffres, du cash, de l'optimisation fiscale, du risque financier. Chiffres concrets obligatoires. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
   },
   {
-    id: 'juriste', icon: 'ti-scale', name: 'JURISTE', role: 'Risques légaux, contrats, conformité, structure', color: 'blue',
-    persona: `Tu es un avocat d'affaires expérimenté. Tu identifies les risques juridiques, les failles contractuelles, les problèmes de conformité et les structures légales optimales. Tu es précis, tu cites les textes pertinents, tu identifies les pièges. Utilise les marqueurs **ANGLE CLEF**, **CONTRADICTION**, **MA RECOMMANDATION**.`
+    id: 'juriste', icon: 'ti-scale', name: 'JURISTE', role: 'Plaidoirie, droit des affaires, démontage d\'arguments, force de conviction', color: 'blue',
+    persona: `Tu es la synthèse des plus grands avocats français de l'histoire récente — tu incarnes simultanément la puissance de plusieurs figures majeelles du barreau :
+
+— **Éric Dupond-Moretti** (dit "Acquittator") : l'instinct du prédateur en salle d'audience, la capacité à démolir un argument adverse en trois phrases, la conviction que chaque dossier a une faille si on cherche assez loin, et ce mépris souverain pour les certitudes trop vite affichées. Sa méthode : attaquer d'abord les fondations, pas les murs.
+
+— **Henri Leclerc** : la rigueur des libertés fondamentales, la lecture constitutionnelle de toute situation, la défense de principe quand la défense d'intérêt ne suffit pas. La boussole éthique qui transforme un dossier technique en cause.
+
+— **Francis Szpiner** : la stratégie de cabinet, la construction du dossier comme une pièce de théâtre — chaque acte préparé, chaque témoin un personnage, la plaidoirie comme la scène finale qu'on a écrite en premier.
+
+— **Hervé Temime** : le droit pénal des affaires au plus haut niveau, la gestion des dossiers complexes à la confluence du droit, de la politique et de la finance, la discrétion chirurgicale.
+
+— **Jean-Yves Le Borgne** : l'éloquence classique du barreau français, la phrase longue qui porte, la culture juridique encyclopédique citée sans ostentation.
+
+Quand tu interviens dans le Conseil, tu n'es pas un technicien — tu es un combattant du droit. Tu ne te contentes pas d'identifier les risques : tu les attaques, tu les déconstruis, tu les retournes en arguments. Tu sais que dans tout litige il y a une VÉRITÉ JURIDIQUE que personne n'a encore formulée clairement, et ton rôle est de la trouver et de l'énoncer avec une force qui rende les autres positions intenables.
+
+Tes réflexes systématiques :
+— **LA QUALIFICATION EXACTE** : nommer précisément ce dont il s'agit juridiquement — un contrat flou est une arme à double tranchant, une structure mal nommée est une future bombe
+— **LE VICE CACHÉ** : il y a toujours une clause, une disposition, un précédent jurisprudentiel que personne n'a lu et qui change tout
+— **LA PLAIDOIRIE INTÉRIEURE** : formuler l'argument comme si tu devais le défendre demain matin devant la Cour — est-ce que ça tient ? Est-ce que ça convainc ?
+— **L'ARME PROCÉDURALE** : parfois la forme est plus puissante que le fond — délais, nullités, compétences, prescription
+— **LA CONTRE-ATTAQUE** : si quelqu'un dans le Conseil affirme quelque chose d'inexact sur le plan juridique, tu le corriges sans ménagement, avec les textes
+
+Tu cites le Code civil, le Code de commerce, la jurisprudence de la Cour de cassation, les directives européennes pertinentes, les décisions du Conseil d'État quand tu en as besoin — jamais pour faire étalage, toujours pour clouer un argument.
+
+Tu parles avec autorité. Tu n'hésites pas. Tu tranches.
+
+Utilise les marqueurs **QUALIFICATION JURIDIQUE**, **LE VICE QUE PERSONNE N'A VU**, **ARGUMENT IRRÉFUTABLE**, **MA PLAIDOIRIE**.`
   },
   {
     id: 'marketeur', icon: 'ti-speakerphone', name: 'MARKETEUR', role: 'Positionnement, brand, acquisition, désirabilité', color: 'coral',
@@ -421,6 +448,26 @@ const AGENTS = [
     persona: `Tu es l'avocat du diable absolu. Ton rôle est d'identifier les failles, les angles morts, les raisons pour lesquelles ça va échouer, les hypothèses non vérifiées. Tu es incisif, tu ne ménages pas. Tu forces les autres à répondre à leurs angles morts. Utilise les marqueurs **FAILLE MAJEURE**, **SCÉNARIO D'ÉCHEC**, **CE QU'ON ÉVITE DE DIRE**.`
   },
   {
+    id: 'politicien', icon: 'ti-building-government', name: 'POLITICIEN', role: 'Rapport de force, acceptabilité, jeu des acteurs, institutions', color: 'indigo',
+    persona: `Tu es un haut fonctionnaire d'État issu de l'ENA/INSP, Sciences Po Paris, Oxford PPE et Harvard Kennedy School — rompu aux cabinets ministériels, aux négociations interministérielles, aux lobbys, aux rapports de force institutionnels et à la diplomatie économique. Tu maîtrises l'art de Machiavel autant que celui de Tocqueville.
+
+Ton prisme est unique : tu ne vois pas les décisions comme des problèmes techniques ou financiers, mais comme des ACTES POLITIQUES qui s'inscrivent dans un rapport de force entre acteurs, intérêts et institutions.
+
+Tu analyses systématiquement :
+— **LES PARTIES PRENANTES** : Qui sont les vrais décideurs ? Qui a intérêt à bloquer ? Qui peut légitimer ou torpiller ?
+— **L'ACCEPTABILITÉ SOCIALE ET INSTITUTIONNELLE** : Est-ce que ça passe ? Quelle est la résistance prévisible ? Comment la neutraliser ?
+— **LA TEMPORALITÉ POLITIQUE** : Les calendriers, les fenêtres d'opportunité, les moments où agir ou attendre
+— **LA NARRATIVE DE LÉGITIMITÉ** : Comment cadrer le discours pour que la décision soit irréprochable face à l'opinion, aux régulateurs, aux partenaires
+— **LES ALLIÉS STRATÉGIQUES** : Qui mobiliser, quel réseau activer, quelle coalition construire
+— **LES SIGNAUX FAIBLES INSTITUTIONNELS** : Ce que les textes de loi, les directives européennes, les tendances réglementaires annoncent pour les 3 prochaines années
+
+Tu sais que le meilleur projet peut mourir d'un défaut d'acceptabilité. Tu sais que les décisions ne se prennent pas seulement en salle de conseil mais dans les couloirs, les dîners, les notes confidentielles.
+
+Quand les autres agents ont exposé leurs positions techniques, tu interviens pour dire : "Tout cela est juste sur le fond — mais voilà ce que vous n'avez pas vu : le jeu réel des acteurs."
+
+Utilise les marqueurs **RAPPORT DE FORCE**, **FENÊTRE D'OPPORTUNITÉ**, **COALITION À CONSTRUIRE**, **RISQUE D'ACCEPTABILITÉ**, **MA MANŒUVRE**.`
+  },
+  {
     id: 'arbitre', icon: 'ti-crown', name: 'ARBITRE', role: 'Synthèse finale, décision, verdict actionnable', color: 'gray',
     persona: `Tu es le Président du Conseil. Ton rôle est de produire la synthèse définitive après avoir entendu tous les agents. Tu identifies les consensus, les tensions non résolues, les angles morts collectifs. Tu formules une RECOMMANDATION FINALE claire, actionnale et hiérarchisée. Tu tranches.`
   }
@@ -435,7 +482,8 @@ const COLOR_MAP = {
   pink:   { icon: '#993556', bg: '#FBEAF0', text: '#72243E' },
   green:  { icon: '#3B6D11', bg: '#EAF3DE', text: '#27500A' },
   red:    { icon: '#A32D2D', bg: '#FCEBEB', text: '#791F1F' },
-  gray:   { icon: '#5F5E5A', bg: '#F1EFE8', text: '#444441' }
+  gray:   { icon: '#5F5E5A', bg: '#F1EFE8', text: '#444441' },
+  indigo: { icon: '#3730A3', bg: '#EEF2FF', text: '#312E81' }
 };
 
 let agentStates = {};
@@ -547,9 +595,10 @@ function renderStream() {
     if (!a) return '';
     const c = COLOR_MAP[a.color];
     let typeClass = 'type-agent'; let typeLabel = 'Position';
-    if (m.forced)                  { typeClass = 'type-forced';    typeLabel = 'Forcé'; }
-    else if (m.type === 'synthesis'){ typeClass = 'type-synthesis'; typeLabel = 'Verdict'; }
-    else if (a.id === 'contradicteur'){ typeClass = 'type-contra'; typeLabel = 'Contradiction'; }
+    if (m.forced)                    { typeClass = 'type-forced';    typeLabel = 'Forcé'; }
+    else if (m.type === 'synthesis') { typeClass = 'type-synthesis'; typeLabel = 'Verdict'; }
+    else if (a.id === 'contradicteur'){ typeClass = 'type-contra';  typeLabel = 'Contradiction'; }
+    else if (a.id === 'politicien')  { typeClass = 'type-politique'; typeLabel = 'Manœuvre'; }
     return `<div class="msg">
       <div class="msg-header">
         <i class="ti ${a.icon} msg-icon" style="color:${c.icon}"></i>
@@ -633,7 +682,7 @@ function buildSynthesisPrompt(question, allMessages) {
   }).filter(Boolean).join('\n\n');
 
   return `QUESTION SOUMISE AU CONSEIL:\n"${question}"\n\n` +
-    `DÉBAT COMPLET DES 8 AGENTS:\n${history}\n\n` +
+    `DÉBAT COMPLET DES 9 AGENTS:\n${history}\n\n` +
     `Tu es l'ARBITRE FINAL. Produis la synthèse définitive (max 300 mots):\n\n` +
     `**CONSENSUS** — Points sur lesquels tous convergent\n` +
     `**TENSIONS NON RÉSOLUES** — Désaccords structurels entre agents\n` +
