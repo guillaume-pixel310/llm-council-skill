@@ -1,7 +1,7 @@
 {
   "skill": "llm-council",
-  "version": "1.0",
-  "description": "Evaluation cases for the llm-council skill. Each case defines a user prompt, whether the skill should trigger, and what the synthesized output must contain.",
+  "version": "2.0",
+  "description": "Evaluation cases for the llm-council skill (v2 MetaGPT role-based architecture). Each case defines a user prompt, whether the skill should trigger, and what the synthesized output must contain.",
   "cases": [
     {
       "id": "trigger-01",
@@ -10,9 +10,9 @@
       "should_trigger": true,
       "expected_behaviors": [
         "Executes scripts/query_llms.py with the microservices question",
-        "Parses JSON responses from both ChatGPT and Gemini",
-        "Synthesizes a response covering service decomposition, communication, and data isolation",
-        "Attributes insights to ChatGPT and Gemini by name"
+        "ProductManager (ChatGPT) analyzes requirements: goals, constraints, team size considerations",
+        "Architect (Gemini) receives PM analysis and designs a concrete solution with service decomposition, communication patterns, and data strategies",
+        "Claude synthesizes both roles' outputs into a final recommendation, crediting each role"
       ]
     },
     {
@@ -22,9 +22,9 @@
       "should_trigger": true,
       "expected_behaviors": [
         "Executes scripts/query_llms.py with the database design question",
-        "Requests clarification or uses placeholder if no schema is provided",
-        "Synthesizes feedback on normalization, indexing, and schema structure",
-        "Attributes specific recommendations to each model"
+        "ProductManager clarifies requirements or flags missing schema context",
+        "Architect proposes schema improvements, indexing strategy, and normalization advice",
+        "Role-based attribution: ProductManager and Architect credited for specific contributions"
       ]
     },
     {
@@ -34,8 +34,9 @@
       "should_trigger": true,
       "expected_behaviors": [
         "Executes scripts/query_llms.py with the REST vs GraphQL question",
-        "Synthesizes tradeoffs from both models' perspectives",
-        "Presents a recommendation based on synthesized consensus"
+        "ProductManager identifies use-case requirements that determine the choice",
+        "Architect evaluates trade-offs with concrete tooling and implementation guidance",
+        "Synthesis presents a context-dependent recommendation based on both roles"
       ]
     },
     {
@@ -45,8 +46,9 @@
       "should_trigger": true,
       "expected_behaviors": [
         "Executes scripts/query_llms.py with the caching question",
-        "Covers cache invalidation strategies, TTL, and cache topology",
-        "Attributes distinct perspectives to ChatGPT and Gemini"
+        "ProductManager surfaces caching requirements: read/write ratio, consistency needs, latency targets",
+        "Architect recommends concrete cache topology, invalidation strategy, and tools (Redis, Memcached, etc.)",
+        "Claude synthesizes into a recommendation that addresses the requirements the PM identified"
       ]
     },
     {
@@ -75,11 +77,12 @@
       "prompt": "Consult the council: Should I use PostgreSQL or MongoDB for my SaaS app?",
       "should_trigger": true,
       "expected_behaviors": [
-        "Output has clear section headers or logical structure",
-        "Both ChatGPT and Gemini are named at least once each",
-        "Output includes a concrete recommendation or decision framework",
-        "Key contributions section lists what each model contributed",
-        "Response is actionable, not just a list of generic tradeoffs"
+        "Output has clear structure referencing both roles",
+        "ProductManager's analysis is cited (e.g., requirements it surfaced)",
+        "Architect's technical design is cited (e.g., schema flexibility, ACID guarantees, query patterns)",
+        "Architect's output shows evidence of context accumulation from PM's analysis",
+        "Synthesis goes beyond listing opinions — reaches a concrete recommendation",
+        "Key role contributions section names ProductManager and Architect with specific insights"
       ]
     },
     {
@@ -88,10 +91,11 @@
       "prompt": "Ask other AI models what they think about using event sourcing for my e-commerce platform",
       "should_trigger": true,
       "expected_behaviors": [
-        "Covers event store choice, snapshot strategy, and eventual consistency",
-        "Attributes at least one concrete pattern or tool to ChatGPT",
-        "Attributes at least one concrete pattern or tool to Gemini",
-        "Synthesis goes beyond simple summarization — identifies where models agree/disagree"
+        "ProductManager identifies e-commerce-specific requirements (audit trail, replay, eventual consistency)",
+        "Architect designs event sourcing approach with concrete patterns (CQRS, event store choice, snapshot strategy)",
+        "Architect's response demonstrably builds on PM's requirements",
+        "Synthesis identifies where roles agreed and where they added complementary perspectives",
+        "Output is actionable: specific tools, implementation steps, or warning signs"
       ]
     },
     {
@@ -101,10 +105,11 @@
       "should_trigger": true,
       "simulated_error": "OPENAI_API_KEY not set",
       "expected_behaviors": [
-        "Informs user that ChatGPT's perspective is unavailable",
-        "Still presents Gemini's perspective",
-        "Offers to provide Claude's own analysis as supplement",
-        "Does NOT crash or produce an empty response"
+        "ProductManager role reports unavailability (OPENAI_API_KEY missing)",
+        "Architect role still executes with the original prompt as context",
+        "Claude informs user that ProductManager's analysis was unavailable",
+        "Claude still synthesizes Architect's perspective and its own analysis",
+        "Does NOT crash or produce empty output"
       ]
     },
     {
@@ -114,9 +119,10 @@
       "should_trigger": true,
       "simulated_error": "Both API keys missing",
       "expected_behaviors": [
-        "Informs user that both external models are unavailable",
-        "Provides setup instructions for .env file",
-        "Offers to answer with Claude's own analysis",
+        "Both ProductManager and Architect report unavailability",
+        "Output JSON still has correct structure (prompt, council, messages)",
+        "Claude informs user both roles are unavailable and provides setup instructions",
+        "Claude offers its own analysis as a fallback",
         "Does NOT produce empty output"
       ]
     }

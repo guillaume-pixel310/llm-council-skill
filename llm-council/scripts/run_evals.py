@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Eval runner for the llm-council skill.
+Eval runner for the llm-council skill (v2 — MetaGPT role-based architecture).
 
 Usage:
   python3 scripts/run_evals.py                     # run all cases
@@ -10,8 +10,9 @@ Usage:
 
 Each case exercises query_llms.py directly and validates:
   1. Script exits cleanly (or with expected error)
-  2. JSON output has the required keys
-  3. Both model responses are non-empty (or error is reported correctly)
+  2. JSON output has the required keys: prompt, council, messages
+  3. council.productmanager.response and council.architect.response are non-empty
+  4. messages list has the expected roles in sequence
 """
 
 import json
@@ -82,28 +83,38 @@ def run_case(case: dict, env_override: Optional[dict] = None) -> dict:
 
     result["checks"].append({"name": "json-parseable", "passed": True})
 
-    # Verify required top-level keys
-    for key in ("prompt", "chatgpt", "gemini"):
+    # Required top-level keys
+    for key in ("prompt", "council", "messages"):
         present = key in output
         result["checks"].append({"name": f"key-{key}", "passed": present})
 
-    if "chatgpt" in output and isinstance(output["chatgpt"], dict):
-        chatgpt_ok = bool(output["chatgpt"].get("response"))
-        result["checks"].append({"name": "chatgpt-response-present", "passed": chatgpt_ok})
+    # council must be a dict with both role keys
+    council = output.get("council") or {}
+    for role_key in ("productmanager", "architect"):
+        present = role_key in council
+        result["checks"].append({"name": f"council-role-{role_key}", "passed": present})
 
-    if "gemini" in output and isinstance(output["gemini"], dict):
-        gemini_ok = bool(output["gemini"].get("response"))
-        result["checks"].append({"name": "gemini-response-present", "passed": gemini_ok})
+    # Each role must have a non-empty response
+    for role_key in ("productmanager", "architect"):
+        role_data = council.get(role_key)
+        if isinstance(role_data, dict):
+            has_response = bool(role_data.get("response"))
+            result["checks"].append({"name": f"{role_key}-response-present", "passed": has_response})
+            has_source = bool(role_data.get("source"))
+            result["checks"].append({"name": f"{role_key}-source-tracked", "passed": has_source})
 
-    if "source" in output.get("chatgpt", {}):
+    # messages list must contain at least 3 entries (User + PM + Architect)
+    messages = output.get("messages", [])
+    result["checks"].append({"name": "messages-min-length", "passed": len(messages) >= 3})
+
+    # messages must appear in correct role sequence
+    if len(messages) >= 3:
+        roles_in_order = [m.get("role") for m in messages[:3]]
+        expected = ["User", "ProductManager", "Architect"]
         result["checks"].append({
-            "name": "chatgpt-source-tracked",
-            "passed": bool(output["chatgpt"]["source"]),
-        })
-    if "source" in output.get("gemini", {}):
-        result["checks"].append({
-            "name": "gemini-source-tracked",
-            "passed": bool(output["gemini"]["source"]),
+            "name": "messages-role-sequence",
+            "passed": roles_in_order == expected,
+            "note": f"got {roles_in_order}" if roles_in_order != expected else "",
         })
 
     result["parsed_output"] = output
@@ -139,7 +150,11 @@ def run_benchmark(cases: list, runs: int):
         if times:
             mean = statistics.mean(times)
             stdev = statistics.stdev(times) if len(times) > 1 else 0.0
-            print(f"  {case['id']}: pass={pass_count}/{runs}  mean={mean:.2f}s  stdev={stdev:.2f}s  min={min(times):.2f}s  max={max(times):.2f}s")
+            print(
+                f"  {case['id']}: pass={pass_count}/{runs}  "
+                f"mean={mean:.2f}s  stdev={stdev:.2f}s  "
+                f"min={min(times):.2f}s  max={max(times):.2f}s"
+            )
         else:
             print(f"  {case['id']}: all runs failed")
 
@@ -157,7 +172,7 @@ def main():
         print("No matching eval cases found.")
         sys.exit(1)
 
-    # Skip cases that should NOT trigger (those test the skill layer, not the script)
+    # Skip cases that test the skill-layer trigger logic (require a live Claude session)
     runnable = [c for c in cases if c.get("should_trigger", True)]
     skipped = [c for c in cases if not c.get("should_trigger", True)]
 

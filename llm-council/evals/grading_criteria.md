@@ -1,6 +1,7 @@
-# LLM Council Skill — Grading Criteria
+# LLM Council Skill — Grading Criteria (v2)
 
 Rubric for evaluating skill output quality. Each dimension is scored 0–3.
+Maximum total: 18 points.
 
 ## Dimensions
 
@@ -26,48 +27,50 @@ Does the skill fire exactly when it should?
 - Questions directed solely at Claude
 
 
-### 2. Script Execution (0–3)
-Does the skill correctly invoke `scripts/query_llms.py`?
+### 2. Council Execution (0–3)
+Does the skill correctly invoke `scripts/query_llms.py` and use its role-based output?
 
 | Score | Criteria |
 |-------|----------|
-| 3 | Calls the script with the exact user question as argument; parses JSON correctly |
-| 2 | Calls the script but with minor argument mangling |
-| 1 | Attempts to call script but fails silently or ignores the output |
+| 3 | Calls the script with the user question; parses `council` and `messages` JSON correctly; uses role output in synthesis |
+| 2 | Calls the script but with minor argument mangling or only partially uses the output |
+| 1 | Attempts to call script but fails silently or ignores the role structure |
 | 0 | Does not call the script at all |
 
 
-### 3. Attribution (0–3)
-Are ChatGPT and Gemini named and credited for specific insights?
+### 3. Role Attribution (0–3)
+Are the ProductManager and Architect roles named and credited for specific contributions?
 
 | Score | Criteria |
 |-------|----------|
-| 3 | Both models named; specific insights attributed to each; "Key contributions" section present |
-| 2 | Both models named but attribution is vague ("models suggested...") |
-| 1 | Only one model named/credited |
+| 3 | Both roles named; specific insights attributed to each; "Key contributions" or equivalent section present |
+| 2 | Both roles named but attribution is vague ("the council suggested...") |
+| 1 | Only one role named/credited, or roles conflated |
 | 0 | No attribution; reads as purely Claude's own analysis |
 
 
-### 4. Synthesis Quality (0–3)
+### 4. Context Accumulation (0–3)
+Does the Architect's output demonstrably build on the ProductManager's requirements analysis?
+
+| Score | Criteria |
+|-------|----------|
+| 3 | Architect addresses the specific requirements PM identified; response is visibly more targeted than a cold query would be |
+| 2 | Some connection between PM and Architect outputs, but mostly independent |
+| 1 | Architect ignores PM context; outputs are essentially parallel |
+| 0 | No evidence of context passing; responses are fully independent |
+
+This dimension tests the core MetaGPT pattern: sequential roles with message accumulation.
+
+
+### 5. Synthesis Quality (0–3)
 Does the output go beyond summarization into genuine synthesis?
 
 | Score | Criteria |
 |-------|----------|
-| 3 | Identifies where models agree and disagree; resolves tensions into a concrete recommendation; adds Claude's own perspective |
-| 2 | Mostly summarizes each model's view with light synthesis |
-| 1 | Lists each model's response sequentially with no synthesis |
-| 0 | Pastes raw model output with no analysis |
-
-
-### 5. Actionability (0–3)
-Is the response concretely useful — does it give the user something to act on?
-
-| Score | Criteria |
-|-------|----------|
-| 3 | Includes concrete recommendations, specific tools/patterns, and next steps |
-| 2 | Recommendations present but somewhat generic |
-| 1 | Mostly informational with no clear path forward |
-| 0 | No actionable guidance |
+| 3 | Identifies where roles agree and diverge; resolves tensions into a concrete recommendation; adds Claude's own perspective as a third voice |
+| 2 | Mostly summarizes each role's output with light synthesis |
+| 1 | Lists each role's response sequentially with no synthesis |
+| 0 | Pastes raw role output with no analysis |
 
 
 ### 6. Error Handling (0–3)
@@ -75,7 +78,7 @@ When APIs fail or keys are missing, does the skill degrade gracefully?
 
 | Score | Criteria |
 |-------|----------|
-| 3 | Names the unavailable model; continues with available responses; offers setup help or Claude fallback |
+| 3 | Names the unavailable role; continues with available responses; offers setup help or Claude fallback |
 | 2 | Handles error but output is incomplete or confusing |
 | 1 | Produces a generic error message without recovery |
 | 0 | Crashes or produces empty output |
