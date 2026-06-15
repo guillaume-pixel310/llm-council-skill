@@ -14,6 +14,7 @@ import sys
 import json
 import shutil
 import subprocess
+import argparse
 from typing import Dict, Optional, Tuple
 import requests
 
@@ -128,12 +129,31 @@ def query_gemini(
         return f"Error querying Gemini ({model}): {str(e)}"
 
 
+def read_file_content(file_path: str) -> str:
+    """Read file content and return as a string with size limit."""
+    max_bytes = 100_000
+    try:
+        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read(max_bytes)
+        if os.path.getsize(file_path) > max_bytes:
+            content += f"\n\n[File truncated at {max_bytes} bytes]"
+        return content
+    except Exception as e:
+        return f"[Could not read file: {str(e)}]"
+
+
 def main():
-    if len(sys.argv) < 2:
+    parser = argparse.ArgumentParser(description="Query multiple LLMs for their perspectives.")
+    parser.add_argument("prompt", nargs="*", help="The prompt to send to the LLMs")
+    parser.add_argument("--file", metavar="PATH", help="Path to a file whose content is appended to the prompt")
+
+    args = parser.parse_args()
+
+    if not args.prompt and not args.file:
         print(
             json.dumps(
                 {
-                    "error": "Usage: query_llms.py <prompt>",
+                    "error": "Usage: query_llms.py <prompt> [--file PATH]",
                     "chatgpt": None,
                     "gemini": None,
                 }
@@ -141,7 +161,13 @@ def main():
         )
         sys.exit(1)
 
-    prompt = " ".join(sys.argv[1:])
+    prompt = " ".join(args.prompt) if args.prompt else ""
+
+    if args.file:
+        file_content = read_file_content(args.file)
+        filename = os.path.basename(args.file)
+        file_section = f"\n\n--- File: {filename} ---\n{file_content}\n--- End of file ---"
+        prompt = (prompt + file_section).strip()
 
     # Load environment variables
     env_vars = load_env_file()
