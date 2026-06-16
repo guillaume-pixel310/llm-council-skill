@@ -12,9 +12,10 @@ except Exception:
     print('')
 " 2>/dev/null)
 
-# Only rebuild when the edited file is inside llm-council/
+root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+# Rebuild llm-council.skill when files inside llm-council/ change
 if [[ "$file_path" == *"llm-council/"* ]]; then
-    root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
     python3 -c "
 import zipfile, os
 root = '$root'
@@ -25,6 +26,21 @@ with zipfile.ZipFile('llm-council.skill', 'w', zipfile.ZIP_DEFLATED) as zf:
             fp = os.path.join(r, f)
             zf.write(fp, os.path.relpath(fp, 'llm-council'))
 print('[hook] Rebuilt llm-council.skill')
+"
+fi
+
+# Rebuild legal.skill when files inside legal/ change
+if [[ "$file_path" == *"legal/"* ]]; then
+    python3 -c "
+import zipfile, os
+root = '$root'
+os.chdir(root)
+with zipfile.ZipFile('legal.skill', 'w', zipfile.ZIP_DEFLATED) as zf:
+    for r, _, files in os.walk('legal'):
+        for f in files:
+            fp = os.path.join(r, f)
+            zf.write(fp, os.path.relpath(fp, 'legal'))
+print('[hook] Rebuilt legal.skill')
 "
 fi
 

@@ -1,0 +1,188 @@
+{
+  "skill": "legal",
+  "version": "1.0",
+  "description": "Evaluation cases for the legal skill (review-contract and meeting-briefing). Each case defines a user prompt, which sub-skill should trigger, and what the output must contain.",
+  "cases": [
+    {
+      "id": "rc-trigger-01",
+      "skill": "legal:review-contract",
+      "category": "trigger-recognition",
+      "prompt": "/legal:review-contract",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Recognizes explicit slash-command invocation",
+        "Asks user for contract text if none is provided",
+        "Does not produce a generic response"
+      ]
+    },
+    {
+      "id": "rc-trigger-02",
+      "skill": "legal:review-contract",
+      "category": "trigger-recognition",
+      "prompt": "Review this contract for me: [NDA text pasted below]",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Triggers on 'review this contract' phrase",
+        "Identifies the document as an NDA",
+        "Produces structured review with risk flags"
+      ]
+    },
+    {
+      "id": "rc-trigger-03",
+      "skill": "legal:review-contract",
+      "category": "trigger-recognition",
+      "prompt": "What are the red flags in this service agreement?",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Triggers on 'red flags in this' phrase",
+        "Requests contract text if not provided",
+        "Produces red/yellow/green flagged output when text is provided"
+      ]
+    },
+    {
+      "id": "rc-no-trigger-01",
+      "skill": "legal:review-contract",
+      "category": "trigger-recognition",
+      "prompt": "What is a contract?",
+      "should_trigger": false,
+      "expected_behaviors": [
+        "Does NOT invoke legal:review-contract",
+        "Answers the general question directly"
+      ]
+    },
+    {
+      "id": "rc-output-01",
+      "skill": "legal:review-contract",
+      "category": "output-quality",
+      "prompt": "Review this contract:\n\nSERVICE AGREEMENT\nThis agreement is between ACME Corp (Client) and Dev LLC (Provider). Provider will deliver software services. Client grants Provider unlimited rights to all work product created. There is no liability cap. Payment is due within 90 days. This agreement auto-renews annually unless cancelled 1 day before renewal.",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Flags 'unlimited rights to all work product' as a red flag (IP ownership issue)",
+        "Flags 'no liability cap' as a red flag",
+        "Flags '90-day payment terms' as a caution or red flag",
+        "Flags '1-day auto-renewal cancellation window' as a red flag",
+        "Provides specific recommended replacement language for at least 2 red flags",
+        "Includes a risk summary table or structured overview",
+        "Notes missing clauses (e.g., confidentiality, governing law, termination for cause)"
+      ]
+    },
+    {
+      "id": "rc-output-02",
+      "skill": "legal:review-contract",
+      "category": "output-quality",
+      "prompt": "Check this NDA: Both parties agree to keep all information confidential forever. Neither party may work with any competitor of the other party for 5 years after the agreement ends. Disputes will be resolved by arbitration in a jurisdiction to be determined later.",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Flags perpetual confidentiality as potentially overreaching (caution)",
+        "Flags 5-year non-compete as a significant red flag (scope and duration)",
+        "Flags 'jurisdiction to be determined later' as a red flag",
+        "Recommends specific time limits for confidentiality (e.g., 3-5 years)",
+        "Recommends specific arbitration venue and rules",
+        "Notes NDA should include a definition of 'confidential information'"
+      ]
+    },
+    {
+      "id": "rc-error-01",
+      "skill": "legal:review-contract",
+      "category": "error-handling",
+      "prompt": "/legal:review-contract (no contract text provided)",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Does NOT produce a fake contract review",
+        "Asks the user to provide contract text or a file path",
+        "Explains what formats are accepted (pasted text, file path)"
+      ]
+    },
+    {
+      "id": "mb-trigger-01",
+      "skill": "legal:meeting-briefing",
+      "category": "trigger-recognition",
+      "prompt": "/legal:meeting-briefing",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Recognizes explicit slash-command invocation",
+        "Asks the 4 context-gathering questions",
+        "Does not produce a generic response"
+      ]
+    },
+    {
+      "id": "mb-trigger-02",
+      "skill": "legal:meeting-briefing",
+      "category": "trigger-recognition",
+      "prompt": "I have a meeting tomorrow with our SaaS vendor about renewing our contract. Help me prepare.",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Triggers on 'help me prepare' for a meeting phrase",
+        "Identifies this as a vendor renewal negotiation",
+        "Asks for additional context or proceeds with what's provided",
+        "Produces a briefing with talking points and objectives"
+      ]
+    },
+    {
+      "id": "mb-trigger-03",
+      "skill": "legal:meeting-briefing",
+      "category": "trigger-recognition",
+      "prompt": "Prepare talking points for my negotiation with a new supplier",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Triggers on 'prepare talking points for'",
+        "Identifies this as a supplier negotiation",
+        "Produces structured talking points with positions and responses"
+      ]
+    },
+    {
+      "id": "mb-no-trigger-01",
+      "skill": "legal:meeting-briefing",
+      "category": "trigger-recognition",
+      "prompt": "What should I bring to a meeting?",
+      "should_trigger": false,
+      "expected_behaviors": [
+        "Does NOT invoke legal:meeting-briefing",
+        "Answers the general question directly"
+      ]
+    },
+    {
+      "id": "mb-output-01",
+      "skill": "legal:meeting-briefing",
+      "category": "output-quality",
+      "prompt": "Brief me for my meeting: We're negotiating a software development contract with Acme Corp. They want unlimited IP rights and we want to retain ownership of our reusable components. They are pushing for a fixed price of $50k but our estimate is $80k. Meeting is Monday.",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Identifies IP ownership and pricing as the two key issues",
+        "Provides a position table with Your Position vs Their Position",
+        "Includes specific talking points for IP ownership (background vs foreground IP argument)",
+        "Includes specific talking points for pricing (scope justification, risk allocation)",
+        "Provides at least 2 anticipated objections with response scripts",
+        "Includes a walk-away condition",
+        "Includes a quick-reference card"
+      ]
+    },
+    {
+      "id": "mb-output-02",
+      "skill": "legal:meeting-briefing",
+      "category": "output-quality",
+      "prompt": "Help me prepare for a dispute meeting with a client who says we delivered late and is threatening to withhold final payment of $25k.",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Identifies this as a dispute / conflict meeting type",
+        "Asks for or notes the need for timeline of events",
+        "Frames the situation summary around the payment dispute",
+        "Provides talking points around delivery evidence and contract terms",
+        "Includes risk assessment (likelihood of escalation, legal exposure)",
+        "Recommends post-meeting follow-up actions (written record, legal consultation)"
+      ]
+    },
+    {
+      "id": "mb-error-01",
+      "skill": "legal:meeting-briefing",
+      "category": "error-handling",
+      "prompt": "/legal:meeting-briefing (no context provided)",
+      "should_trigger": true,
+      "expected_behaviors": [
+        "Asks the 4 gathering questions: who, what, goal, background",
+        "Does NOT invent a fake meeting scenario",
+        "Explains it will generate the briefing once context is provided"
+      ]
+    }
+  ]
+}
