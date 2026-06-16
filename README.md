@@ -21,6 +21,8 @@ Simply ask Claude to consult with other AI models using phrases like:
 - "**Ask ChatGPT and Gemini** what they think about my database design"
 - "**Get perspectives from other AI models** on this technical decision"
 - "**Consult with other LLMs:** What's the best approach for..."
+- "**Consult the council about this file:** review my API handler for security issues"
+- "**Ask ChatGPT and Gemini to review** my database schema"
    <img width="609" height="79" alt="council_demo3" src="https://github.com/user-attachments/assets/ba98d179-08be-4cc8-ac6a-0e1bc69b3fc7" />
 
 
@@ -32,6 +34,17 @@ Claude will then:
 - Query ChatGPT and Gemini about React architecture
 - Analyze their suggestions on components, state management, and organization
 - Present a synthesized plan incorporating insights from all three models
+```
+
+**File Review Example:**
+```
+User: Consult the council about this file: review my API handler for security issues
+      [uploads api_handler.py via Files API]
+
+Claude will then:
+- Pass the file content to both ChatGPT and Gemini alongside the question
+- Synthesize security findings from all three models
+- Present a prioritized list of issues with attribution
 ```
 
 ## Installation
@@ -120,6 +133,21 @@ Both OpenAI and Gemini APIs have usage costs that vary significantly by model:
 - Monitor your usage patterns and adjust model choices accordingly
 
 **Note:** Each `/council` command makes 2 API calls (one to ChatGPT, one to Gemini), so total cost is the sum of both models' pricing.
+
+## File Support
+
+The council can review any file you upload — source code, database schemas, config files, or documents.
+
+Files uploaded via the [Files API](https://docs.anthropic.com/en/build-with-claude/files) are mounted in the sandbox at the path you specify. The skill reads them and sends their content to both ChatGPT and Gemini alongside your question.
+
+```
+# Internally the skill calls:
+python3 scripts/query_llms.py "Your question here" --file /path/to/your/file
+```
+
+Files up to ~100 KB are fully included. Larger files are truncated with a notice.
+
+Supported file types: source code, `.sql`, `.json`, `.yaml`, `.csv`, `.txt`, `.md`, and any UTF-8 text file.
 
 ## Skill Structure
 

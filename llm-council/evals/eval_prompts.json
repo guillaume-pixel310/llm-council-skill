@@ -119,6 +119,45 @@
         "Offers to answer with Claude's own analysis",
         "Does NOT produce empty output"
       ]
+    },
+    {
+      "id": "file-01",
+      "category": "file-input",
+      "prompt": "Consult the council about this file: review my API handler for security vulnerabilities",
+      "should_trigger": true,
+      "file_arg": "--file /workspace/api_handler.py",
+      "expected_behaviors": [
+        "Passes --file flag to query_llms.py alongside the prompt",
+        "Both ChatGPT and Gemini receive the file content in their queries",
+        "Output identifies specific security issues referencing the file",
+        "Attributes findings to ChatGPT and Gemini by name"
+      ]
+    },
+    {
+      "id": "file-02",
+      "category": "file-input",
+      "prompt": "Ask ChatGPT and Gemini to review my database schema",
+      "should_trigger": true,
+      "file_arg": "--file /workspace/schema.sql",
+      "expected_behaviors": [
+        "Passes --file flag to query_llms.py with the schema file",
+        "Output covers normalization, indexing, and constraint feedback",
+        "Both models' perspectives are included and attributed",
+        "Synthesis includes actionable improvements to the schema"
+      ]
+    },
+    {
+      "id": "file-03",
+      "category": "file-input",
+      "prompt": "Consult the council: what do you think of this code?",
+      "should_trigger": true,
+      "file_arg": "--file /workspace/main.py",
+      "expected_behaviors": [
+        "Invokes query_llms.py with --file pointing to the mounted file",
+        "Output covers code quality, structure, and potential improvements",
+        "JSON output contains non-empty chatgpt.response and gemini.response",
+        "File content is included in prompt sent to both LLMs"
+      ]
     }
   ]
 }

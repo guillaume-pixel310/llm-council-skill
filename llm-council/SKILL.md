@@ -19,10 +19,28 @@ When user requests consultation with other AI models, use phrases like:
 
 **Process:**
 
-1. **Query external LLMs**: Run `scripts/query_llms.py` with the user's prompt to get perspectives from both ChatGPT and Gemini
+1. **Query external LLMs**: Run `scripts/query_llms.py` with the user's prompt (and optionally a file) to get perspectives from both ChatGPT and Gemini
 2. **Analyze responses**: Review what each model suggests, identifying valuable insights, alternative approaches, and potential concerns
 3. **Synthesize plan**: Create an implementation plan that incorporates the best ideas from all three models (Claude's own analysis + ChatGPT + Gemini)
 4. **Present to user**: Show the final plan along with a brief summary of key contributions from each model
+
+### File-Based Queries
+
+When the user wants the council to review a file (code, schema, config, document):
+
+1. The file will be available at a known path in the sandbox (e.g. mounted via the Files API, or present in the working directory)
+2. Pass it to the script using `--file`:
+   ```
+   python3 scripts/query_llms.py "Review this code for issues" --file /path/to/file.py
+   ```
+3. The script appends the file content to the prompt under a clearly labeled header
+4. Both ChatGPT and Gemini receive the full file content alongside the question
+
+**Trigger phrases that include files:**
+- "Consult the council about this file: ..."
+- "Ask ChatGPT and Gemini to review [filename]"
+- "Get council feedback on my [schema/code/config]"
+- "Have the council look at this [file/document]"
 
 ## Setup Requirements
 
@@ -124,6 +142,15 @@ Present the final implementation plan naturally, mentioning key insights from ot
 Key contributions:
 - ChatGPT: [brief summary]
 - Gemini: [brief summary]"
+
+### Example 3: File Review
+
+**User input:** "Consult the council about this file: review my API handler for security issues" (with `api_handler.py` mounted at `/workspace/api_handler.py`)
+
+**Claude's process:**
+1. Execute: `python3 scripts/query_llms.py "Review this API handler for security issues" --file /workspace/api_handler.py`
+2. Both ChatGPT and Gemini receive the full file content with the question
+3. Synthesize security findings from both models with Claude's own analysis
 
 ## Error Handling
 
