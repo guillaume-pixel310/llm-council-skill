@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journal Astral</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+  .api-banner {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(255,200,80,0.08); border: 1px solid rgba(255,200,80,0.3);
+    border-radius: 8px; padding: 10px 14px; margin: 0 24px 16px;
+    font-size: 12px; font-family: Arial, sans-serif; color: #ddaa44;
+  }
+  .api-banner input {
+    flex: 1; min-width: 200px; font-size: 12px; font-family: monospace;
+    border: 1px solid rgba(150,100,255,0.3); border-radius: 4px; padding: 6px 8px;
+    background: rgba(255,255,255,0.05); color: #e8e0ff;
+  }
+  .api-banner button {
+    border: none; border-radius: 4px; padding: 6px 12px; font-size: 12px;
+    background: #cc9933; color: #14101f; cursor: pointer; font-family: Arial, sans-serif;
+  }
+  .api-banner.has-key { background: rgba(80,180,80,0.08); border-color: rgba(80,180,80,0.3); color: #88cc88; }
+  .api-banner.has-key button { background: #4a9d4a; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect } = React;
+
+const NATAL = {
+  name: "Guillaume",
+  sun: { sign: "Balance", degree: 10, emoji: "⚖️" },
+  moon: { sign: "Cancer", degree: 22, emoji: "🦀" },
+  rising: { sign: "Cancer", degree: 8, emoji: "🦀" },
+  mercury: { sign: "Scorpion", emoji: "🦂" },
+  venus: { sign: "Scorpion", emoji: "🦂" },
+  mars: { sign: "Gémeaux", emoji: "👯" },
+  saturn: { sign: "Balance", emoji: "⚖️" },
+  birthDate: "3 octobre 1982 – 23h45 – Vénissieux · Lune des Moissons 🌕",
+  birthMoon: "Lune des Moissons — halo décroissant (pic ~21h avant naissance)",
+};
+
+const MOON_CYCLE = [
+  { name: "Nouvelle Lune", emoji: "🌑", energy: "Semence", color: "#1a1a2e" },
+  { name: "Premier Croissant", emoji: "🌒", energy: "Intention", color: "#16213e" },
+  { name: "Premier Quartier", emoji: "🌓", energy: "Action", color: "#0f3460" },
+  { name: "Gibbeuse Croissante", emoji: "🌔", energy: "Raffinement", color: "#1a1a5e" },
+  { name: "Pleine Lune", emoji: "🌕", energy: "Plénitude", color: "#2d1b69" },
+  { name: "Gibbeuse Décroissante", emoji: "🌖", energy: "Gratitude", color: "#1a0a3e" },
+  { name: "Dernier Quartier", emoji: "🌗", energy: "Lâcher prise", color: "#0d0d2b" },
+  { name: "Dernier Croissant", emoji: "🌘", energy: "Repos", color: "#050518" },
+];
+
+const ZODIAC_SIGNS = [
+  "Bélier","Taureau","Gémeaux","Cancer","Lion","Vierge",
+  "Balance","Scorpion","Sagittaire","Capricorne","Verseau","Poissons"
+];
+
+const SIGN_ELEMENTS = {
+  "Bélier": "Feu", "Lion": "Feu", "Sagittaire": "Feu",
+  "Taureau": "Terre", "Vierge": "Terre", "Capricorne": "Terre",
+  "Gémeaux": "Air", "Balance": "Air", "Verseau": "Air",
+  "Cancer": "Eau", "Scorpion": "Eau", "Poissons": "Eau",
+};
+
+const ELEMENT_COLORS = {
+  "Feu": { bg: "rgba(220,80,40,0.15)", border: "rgba(220,80,40,0.4)", text: "#ff9966" },
+  "Terre": { bg: "rgba(80,160,80,0.15)", border: "rgba(80,160,80,0.4)", text: "#88cc88" },
+  "Air": { bg: "rgba(100,160,220,0.15)", border: "rgba(100,160,220,0.4)", text: "#aaddff" },
+  "Eau": { bg: "rgba(60,100,200,0.15)", border: "rgba(60,100,200,0.4)", text: "#99bbff" },
+};
+
+const CLAUDE_MODEL = "claude-sonnet-4-6";
+
+function getMoonPhase(date) {
+  const known = new Date(2000, 0, 6);
+  const diff = (date - known) / (1000 * 60 * 60 * 24);
+  const cycle = 29.53058867;
+  const phase = ((diff % cycle) + cycle) % cycle;
+  const idx = Math.floor((phase / cycle) * 8) % 8;
+  return { ...MOON_CYCLE[idx], phase: phase.toFixed(1), cycleDay: Math.round(phase) };
+}
+
+function getMoonSign(date) {
+  const base = new Date(2000, 0, 6);
+  const days = (date - base) / (1000 * 60 * 60 * 24);
+  const moonCycleDays = 27.321661;
+  const idx = Math.floor(((days % (moonCycleDays * 12)) / (moonCycleDays * 12)) * 12 + 5) % 12;
+  return ZODIAC_SIGNS[idx];
+}
+
+function getCompatibility(moonSign, natal) {
+  const moonEl = SIGN_ELEMENTS[moonSign];
+  const sunEl = SIGN_ELEMENTS[natal.sun.sign];
+  const risingEl = SIGN_ELEMENTS[natal.rising.sign];
+  let score = 0;
+  let aspects = [];
+  if (moonEl === sunEl) { score += 3; aspects.push(`Lune en ${moonSign} résonne avec votre Soleil ${natal.sun.sign} — même élément ${moonEl}`); }
+  if (moonEl === risingEl) { score += 2; aspects.push(`Harmonie avec votre Ascendant ${natal.rising.sign}`); }
+  if (moonSign === natal.moon.sign) { score += 4; aspects.push(`La Lune transit votre Lune natale — journée émotionnellement intense`); }
+  if (moonSign === natal.sun.sign) { score += 3; aspects.push(`Lune sur votre Soleil natal — visibilité et vitalité amplifiées`); }
+  if (moonSign === "Cancer") { score += 1; aspects.push("Cancer favorise l'introspection et la famille"); }
+  if (moonSign === "Balance") { score += 2; aspects.push("Balance active votre énergie solaire natale"); }
+  if (moonSign === "Scorpion") { score += 1; aspects.push("Scorpion intensifie Mercure et Vénus de votre thème"); }
+  if (aspects.length === 0) aspects.push(`Lune en ${moonSign} — énergie neutre, journée pour l'observation`);
+  const level = score >= 5 ? "Exceptionnelle" : score >= 3 ? "Favorable" : score >= 1 ? "Neutre" : "Tension";
+  const levelColor = score >= 5 ? "#ffd700" : score >= 3 ? "#88ff88" : score >= 1 ? "#aaaaff" : "#ff8888";
+  return { score, level, levelColor, aspects };
+}
+
+function getApiKey() {
+  return localStorage.getItem("astro_journal_api_key") || "";
+}
+
+function ApiKeyBanner({ apiKey, onSave }) {
+  const [value, setValue] = useState(apiKey);
+  const hasKey = !!apiKey;
+  return (
+    <div className={"api-banner" + (hasKey ? " has-key" : "")}>
+      <span>{hasKey ? "✓ Clé API Anthropic enregistrée" : "Clé API Anthropic :"}</span>
+      <input
+        type="password"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        placeholder="sk-ant-..."
+        autoComplete="off"
+      />
+      <button onClick={() => onSave(value.trim())}>Enregistrer</button>
+      <span style={{ opacity: 0.7 }}>Stockée localement dans votre navigateur</span>
+    </div>
+  );
+}
+
+function AstroJournal() {
+  const [apiKey, setApiKey] = useState(getApiKey());
+  const [reading, setReading] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("today");
+  const [journalNote, setJournalNote] = useState("");
+  const [notes, setNotes] = useState([]);
+
+  const today = new Date();
+  const moonPhase = getMoonPhase(today);
+  const moonSign = getMoonSign(today);
+  const compat = getCompatibility(moonSign, NATAL);
+  const moonEl = SIGN_ELEMENTS[moonSign];
+  const elColors = ELEMENT_COLORS[moonEl];
+  const dateStr = today.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+  function saveApiKey(key) {
+    localStorage.setItem("astro_journal_api_key", key);
+    setApiKey(key);
+  }
+
+  async function generateReading() {
+    if (!apiKey) {
+      setError("Entrez votre clé API Anthropic ci-dessus pour générer une lecture.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const prompt = `Tu es un astrologue expert. Génère une lecture quotidienne personnalisée en français pour Guillaume.
+
+THÈME NATAL DE GUILLAUME :
+- Soleil Balance (10°)
+- Lune Cancer (22°) — Ascendant Cancer (8°)
+- Mercure Scorpion, Vénus Scorpion, Mars Gémeaux, Saturne Balance
+- Né 3 octobre 1982, 23h45, Vénissieux
+- Né dans le halo décroissant de la Lune des Moissons d'octobre 1982 (pic ~21h avant sa naissance)
+- Contexte vie : entrepreneur luxembourgeois, projet CARNIS (groupe boucherie premium, objectif 40-80M€), séparation en cours, candidature Grande Loge de Luxembourg, fille Clara-Gabriela (Scorpion, née 14/11/2017), partenaire Caroline (Poissons, née 16/3/1976)
+
+POSITION LUNAIRE AUJOURD'HUI : Lune en ${moonSign} (${moonEl}), phase ${moonPhase.name} (jour ${moonPhase.cycleDay}/29), énergie "${moonPhase.energy}"
+DATE : ${dateStr}
+COMPATIBILITÉ : ${compat.level} (score ${compat.score})
+
+Génère une lecture structurée en JSON strict :
+{
+  "titreJour": "titre poétique du jour (5-8 mots)",
+  "messageCore": "message principal 2-3 phrases — direct, personnalisé pour Guillaume, pas de flatterie, ancré dans sa réalité (CARNIS, séparation, franc-maçonnerie, Clara)",
+  "domainesJour": [
+    {"domaine": "Affaires & CARNIS", "icone": "🥩", "lecture": "2 phrases spécifiques"},
+    {"domaine": "Émotions & Relations", "icone": "💙", "lecture": "2 phrases — séparation / Clara / Caroline"},
+    {"domaine": "Franc-maçonnerie & Chemin", "icone": "🔺", "lecture": "2 phrases symboliques"}
+  ],
+  "luneMessage": "Ce que la Lune en ${moonSign} dit spécifiquement à un Soleil Balance avec Ascendant Cancer né dans le halo de la Lune des Moissons — 2 phrases",
+  "actionDuJour": "1 action concrète pour aujourd'hui, simple et directe",
+  "motSymbolique": "un mot en grec ou hébreu avec sa translitération et signification — en lien avec Αὐτοψία ou בטחון"
+}
+
+Réponds UNIQUEMENT avec le JSON. Aucun texte avant ou après.`;
+
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: CLAUDE_MODEL,
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try { const d = await res.json(); msg = d.error?.message || msg; } catch (_) {}
+        throw new Error(msg);
+      }
+      const data = await res.json();
+      const text = data.content.find(b => b.type === "text")?.text || "{}";
+      const clean = text.replace(/```json|```/g, "").trim();
+      setReading(JSON.parse(clean));
+    } catch (e) {
+      console.error(e);
+      setError(e.message || "Erreur lors de la génération de la lecture.");
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    if (apiKey) generateReading();
+  }, []);
+
+  function saveNote() {
+    if (!journalNote.trim()) return;
+    setNotes(prev => [{ text: journalNote, date: dateStr, moon: moonSign }, ...prev]);
+    setJournalNote("");
+  }
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(160deg, #0a0a1a 0%, #0d0d2b 40%, #1a0a2e 100%)",
+      color: "#e8e0ff",
+      fontFamily: "'Georgia', serif",
+    }}>
+      <div style={{
+        background: "linear-gradient(180deg, rgba(30,10,60,0.9) 0%, transparent 100%)",
+        padding: "28px 24px 20px",
+        borderBottom: "1px solid rgba(150,100,255,0.15)",
+      }}>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <div style={{ fontSize: 11, letterSpacing: 3, color: "#9988bb", textTransform: "uppercase", marginBottom: 4 }}>
+                Journal Astral
+              </div>
+              <h1 style={{ fontSize: 22, fontWeight: "normal", color: "#e8d8ff", margin: 0 }}>
+                {NATAL.name} {NATAL.sun.emoji}
+              </h1>
+              <div style={{ fontSize: 12, color: "#7766aa", marginTop: 2 }}>{NATAL.birthDate}</div>
+              <div style={{ fontSize: 11, color: "#554466", marginTop: 2 }}>
+                🌕 {NATAL.birthMoon}
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 32 }}>{moonPhase.emoji}</div>
+              <div style={{ fontSize: 11, color: "#9988bb", marginTop: 2 }}>{moonPhase.name}</div>
+              <div style={{
+                display: "inline-block", marginTop: 4, padding: "2px 8px",
+                background: elColors.bg, border: `1px solid ${elColors.border}`,
+                borderRadius: 20, fontSize: 11, color: elColors.text
+              }}>
+                Lune en {moonSign} · {moonEl}
+              </div>
+            </div>
+          </div>
+          <div style={{
+            marginTop: 16, padding: "8px 14px",
+            background: "rgba(255,255,255,0.04)", borderRadius: 8,
+            border: `1px solid ${compat.levelColor}33`,
+            display: "flex", alignItems: "center", gap: 10
+          }}>
+            <div style={{ fontSize: 10, color: "#7766aa", textTransform: "uppercase", letterSpacing: 2 }}>Résonance</div>
+            <div style={{ fontSize: 13, color: compat.levelColor, fontWeight: "bold" }}>{compat.level}</div>
+            <div style={{ fontSize: 11, color: "#9988bb", flex: 1 }}>{compat.aspects[0]}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 680, margin: "16px auto 0" }}>
+        <ApiKeyBanner apiKey={apiKey} onSave={saveApiKey} />
+      </div>
+
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(150,100,255,0.15)" }}>
+          {[["today","Aujourd'hui"],["theme","Thème Natal"],["journal","Journal"]].map(([id, label]) => (
+            <button key={id} onClick={() => setActiveTab(id)} style={{
+              background: "none", border: "none", padding: "10px 18px",
+              fontSize: 13, cursor: "pointer",
+              color: activeTab === id ? "#cc99ff" : "#665588",
+              borderBottom: activeTab === id ? "2px solid #cc99ff" : "2px solid transparent",
+              fontFamily: "inherit",
+            }}>{label}</button>
+          ))}
+        </div>
+
+        {activeTab === "today" && (
+          <div style={{ paddingTop: 20, paddingBottom: 40 }}>
+            <div style={{ fontSize: 11, color: "#6655aa", letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>
+              {dateStr}
+            </div>
+            {loading && (
+              <div style={{ textAlign: "center", padding: "60px 0", color: "#9988bb" }}>
+                <div style={{ fontSize: 28, marginBottom: 12 }}>✨</div>
+                <div style={{ fontSize: 13, letterSpacing: 2 }}>Lecture en cours…</div>
+              </div>
+            )}
+            {error && !loading && (
+              <div style={{ padding: 14, marginBottom: 20, background: "rgba(220,80,40,0.1)", border: "1px solid rgba(220,80,40,0.3)", borderRadius: 10, fontSize: 13, color: "#ff9966" }}>
+                {error}
+              </div>
+            )}
+            {reading && !loading && (
+              <>
+                <h2 style={{ fontSize: 18, color: "#ddc8ff", fontWeight: "normal", marginBottom: 20, lineHeight: 1.4 }}>
+                  {reading.titreJour}
+                </h2>
+                <div style={{ padding: 18, marginBottom: 20, background: "rgba(150,100,255,0.08)", border: "1px solid rgba(150,100,255,0.2)", borderRadius: 10, lineHeight: 1.7, fontSize: 14, color: "#ccc0ee" }}>
+                  {reading.messageCore}
+                </div>
+                <div style={{ padding: 14, marginBottom: 20, background: elColors.bg, border: `1px solid ${elColors.border}`, borderRadius: 10, fontSize: 13, color: elColors.text, lineHeight: 1.6 }}>
+                  <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6, opacity: 0.7 }}>
+                    {moonPhase.emoji} Lune en {moonSign} — {moonPhase.name}
+                  </div>
+                  {reading.luneMessage}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+                  {reading.domainesJour?.map((d, i) => (
+                    <div key={i} style={{ padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(150,100,255,0.12)", borderRadius: 10 }}>
+                      <div style={{ fontSize: 13, color: "#bb99ee", marginBottom: 6 }}>{d.icone} {d.domaine}</div>
+                      <div style={{ fontSize: 13, color: "#aa99cc", lineHeight: 1.6 }}>{d.lecture}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+                  <div style={{ padding: 14, background: "rgba(80,180,80,0.07)", border: "1px solid rgba(80,180,80,0.2)", borderRadius: 10 }}>
+                    <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#88cc88", marginBottom: 6 }}>Action du jour</div>
+                    <div style={{ fontSize: 13, color: "#aaddaa", lineHeight: 1.5 }}>{reading.actionDuJour}</div>
+                  </div>
+                  <div style={{ padding: 14, background: "rgba(255,200,80,0.07)", border: "1px solid rgba(255,200,80,0.2)", borderRadius: 10 }}>
+                    <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#ddaa44", marginBottom: 6 }}>Mot symbolique</div>
+                    <div style={{ fontSize: 13, color: "#ffddaa", lineHeight: 1.5 }}>{reading.motSymbolique}</div>
+                  </div>
+                </div>
+              </>
+            )}
+            <button onClick={generateReading} disabled={loading} style={{ width: "100%", padding: "12px", background: "rgba(150,100,255,0.1)", border: "1px solid rgba(150,100,255,0.3)", borderRadius: 8, color: "#cc99ff", fontSize: 13, cursor: loading ? "default" : "pointer", fontFamily: "inherit", letterSpacing: 1, opacity: loading ? 0.6 : 1 }}>
+              ↻ Nouvelle lecture
+            </button>
+          </div>
+        )}
+
+        {activeTab === "theme" && (
+          <div style={{ paddingTop: 20, paddingBottom: 40 }}>
+            <div style={{ fontSize: 13, color: "#6655aa", marginBottom: 20 }}>Thème natal enregistré</div>
+            {[
+              { label: "Soleil", value: `${NATAL.sun.sign} 10° ${NATAL.sun.emoji}`, desc: "Identité, volonté" },
+              { label: "Lune", value: `${NATAL.moon.sign} 22° ${NATAL.moon.emoji}`, desc: "Émotions, instinct" },
+              { label: "Ascendant", value: `${NATAL.rising.sign} 8° ${NATAL.rising.emoji}`, desc: "Façade, première impression" },
+              { label: "Mercure", value: `${NATAL.mercury.sign} ${NATAL.mercury.emoji}`, desc: "Communication, mental" },
+              { label: "Vénus", value: `${NATAL.venus.sign} ${NATAL.venus.emoji}`, desc: "Amour, valeurs" },
+              { label: "Mars", value: `${NATAL.mars.sign} ${NATAL.mars.emoji}`, desc: "Action, désir" },
+              { label: "Saturne", value: `${NATAL.saturn.sign} ${NATAL.saturn.emoji}`, desc: "Discipline, karma" },
+            ].map((p, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid rgba(150,100,255,0.1)" }}>
+                <div>
+                  <div style={{ fontSize: 13, color: "#cc99ff" }}>{p.label}</div>
+                  <div style={{ fontSize: 11, color: "#665588" }}>{p.desc}</div>
+                </div>
+                <div style={{ fontSize: 14, color: "#e8d8ff" }}>{p.value}</div>
+              </div>
+            ))}
+            <div style={{ marginTop: 20, padding: 14, background: "rgba(150,100,255,0.06)", border: "1px solid rgba(150,100,255,0.15)", borderRadius: 10, fontSize: 12, color: "#9988bb", lineHeight: 1.7 }}>
+              <strong style={{ color: "#cc99ff" }}>Lune de naissance :</strong> Né dans le halo décroissant de la Lune des Moissons d'octobre 1982 — plénitude atteinte ~21h avant votre naissance à 23h45. Configuration rare : octobre Lune des Moissons survient tous les 3 à 5 ans seulement.
+            </div>
+          </div>
+        )}
+
+        {activeTab === "journal" && (
+          <div style={{ paddingTop: 20, paddingBottom: 40 }}>
+            <div style={{ fontSize: 13, color: "#9988bb", marginBottom: 16 }}>Notez vos ressentis du jour</div>
+            <textarea
+              value={journalNote}
+              onChange={e => setJournalNote(e.target.value)}
+              placeholder={`${moonPhase.emoji} Lune en ${moonSign}… Qu'est-ce que vous ressentez aujourd'hui ?`}
+              style={{ width: "100%", minHeight: 120, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(150,100,255,0.2)", borderRadius: 10, color: "#e8e0ff", fontSize: 13, padding: 14, fontFamily: "inherit", resize: "vertical", outline: "none", lineHeight: 1.6, boxSizing: "border-box" }}
+            />
+            <button onClick={saveNote} style={{ marginTop: 10, padding: "10px 20px", background: "rgba(150,100,255,0.15)", border: "1px solid rgba(150,100,255,0.3)", borderRadius: 8, color: "#cc99ff", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+              Sauvegarder
+            </button>
+            {notes.length > 0 && (
+              <div style={{ marginTop: 24 }}>
+                <div style={{ fontSize: 11, letterSpacing: 2, color: "#665588", textTransform: "uppercase", marginBottom: 12 }}>Notes précédentes</div>
+                {notes.map((n, i) => (
+                  <div key={i} style={{ padding: 14, marginBottom: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(150,100,255,0.1)", borderRadius: 10 }}>
+                    <div style={{ fontSize: 11, color: "#665588", marginBottom: 6 }}>{n.date} · Lune en {n.moon}</div>
+                    <div style={{ fontSize: 13, color: "#aa99cc", lineHeight: 1.6 }}>{n.text}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<AstroJournal />);
+</script>
+</body>
+</html>
