@@ -88,11 +88,20 @@ function getMoonPhase(date) {
   return { ...MOON_CYCLE[idx], phase: phase.toFixed(1), cycleDay: Math.round(phase) };
 }
 
+function getMoonEclipticLongitude(date) {
+  // Low-precision lunar position (Meeus, Astronomical Algorithms ch. 47),
+  // accurate to a fraction of a degree — plenty for zodiac sign placement.
+  const d = date.getTime() / 86400000 - 10957.5; // days since J2000.0
+  const rad = Math.PI / 180;
+  const meanLongitude = rad * (218.316 + 13.176396 * d);
+  const meanAnomaly = rad * (134.963 + 13.064993 * d);
+  const longitude = meanLongitude + rad * 6.289 * Math.sin(meanAnomaly);
+  return ((longitude * 180 / Math.PI) % 360 + 360) % 360;
+}
+
 function getMoonSign(date) {
-  const base = new Date(2000, 0, 6);
-  const days = (date - base) / (1000 * 60 * 60 * 24);
-  const moonCycleDays = 27.321661;
-  const idx = Math.floor(((days % (moonCycleDays * 12)) / (moonCycleDays * 12)) * 12 + 5) % 12;
+  const lonDeg = getMoonEclipticLongitude(date);
+  const idx = Math.floor(lonDeg / 30) % 12;
   return ZODIAC_SIGNS[idx];
 }
 
