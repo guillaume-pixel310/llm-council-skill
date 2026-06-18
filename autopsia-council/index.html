@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ΑΥΤΟΨΙΑ Council</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: #080810; }
+  .api-banner {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 6px; padding: 10px 14px; margin: 0 0 24px;
+    font-size: 12px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; color: #D4AF37;
+  }
+  .api-banner input {
+    flex: 1; min-width: 200px; font-size: 12px; font-family: monospace;
+    border: 1px solid rgba(212,175,55,0.3); border-radius: 4px; padding: 6px 8px;
+    background: rgba(255,255,255,0.05); color: #E0E0E8;
+  }
+  .api-banner button {
+    border: none; border-radius: 4px; padding: 6px 12px; font-size: 12px;
+    background: #D4AF37; color: #080810; cursor: pointer; font-family: inherit;
+  }
+  .api-banner.has-key { background: rgba(76,175,80,0.08); border-color: rgba(76,175,80,0.3); color: #4CAF50; }
+  .api-banner.has-key button { background: #4CAF50; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useRef } = React;
+
+// ─── Identités des 5 agents ───────────────────────────────────────────────
+const AGENTS = [
+  {
+    id: "fossoyeur",
+    name: "Fossoyeur",
+    symbol: "☠",
+    role: "Diable / Adversarial",
+    color: "#C0392B",
+    glow: "rgba(192,57,43,0.4)",
+    systemPrompt: `Tu es le Fossoyeur — agent adversarial, challenger radical.
+Ton rôle : détruire les hypothèses, chercher ce qui peut tuer l'idée, identifier les angles morts fatals, les risques cachés, les illusions confortables.
+Tu ne cherches pas à être négatif pour le principe : tu cherches ce qui est vraiment fragile.
+Tu poses la question que personne ne veut poser.
+Sois brutal, précis, court. Pas de politesse. Pas de flatterie.
+Réponds en français. Maximum 200 mots.`,
+  },
+  {
+    id: "chirurgien",
+    name: "Chirurgien",
+    symbol: "⚕",
+    role: "Déconstruction des hypothèses",
+    color: "#2980B9",
+    glow: "rgba(41,128,185,0.4)",
+    systemPrompt: `Tu es le Chirurgien — analyste froid, déconstruction des hypothèses.
+Ton rôle : identifier les prémisses implicites, les raisonnements circulaires, les causalités supposées non démontrées.
+Tu ne juges pas si c'est bien ou mal — tu opères avec précision pour exposer la structure logique réelle derrière l'apparente.
+Sois méthodique, incisif, neutre. Pas d'émotion. Pas de jugement moral.
+Réponds en français. Maximum 200 mots.`,
+  },
+  {
+    id: "prospecteur",
+    name: "Prospecteur",
+    symbol: "⛏",
+    role: "Opportunités / Optimiste",
+    color: "#27AE60",
+    glow: "rgba(39,174,96,0.4)",
+    systemPrompt: `Tu es le Prospecteur — chercheur d'opportunités, optimiste stratégique.
+Ton rôle : trouver ce qui n'a pas été vu, les leviers cachés, les connexions inattendues, les gains possibles même dans une situation difficile.
+Tu ne balaies pas les problèmes sous le tapis — tu cherches les vraies ouvertures dans le réel.
+Sois enthousiaste mais ancré dans le concret. Pas de vœux pieux.
+Réponds en français. Maximum 200 mots.`,
+  },
+  {
+    id: "martien",
+    name: "Martien",
+    symbol: "◈",
+    role: "Perspective extérieure / Naïve",
+    color: "#8E44AD",
+    glow: "rgba(142,68,173,0.4)",
+    systemPrompt: `Tu es le Martien — regard extérieur, perspective naïve volontaire.
+Ton rôle : regarder la situation comme si tu la découvrais pour la première fois, sans contexte culturel, sans habitudes de pensée.
+Tu poses les questions "évidentes" que les gens trop impliqués n'osent plus poser.
+Tu remarques ce qui semble bizarre ou absurde vu de l'extérieur.
+Sois décalé, curieux, direct. Pas de référence aux conventions habituelles.
+Réponds en français. Maximum 200 mots.`,
+  },
+  {
+    id: "sergent",
+    name: "Sergent",
+    symbol: "⚡",
+    role: "Action / TDAH-compatible",
+    color: "#E67E22",
+    glow: "rgba(230,126,34,0.4)",
+    systemPrompt: `Tu es le Sergent — orienté action, compatible TDAH, horizon J/7j/30j.
+Ton rôle : transformer tout ça en actions concrètes, priorisées, réalistes.
+Pas de théorie. Pas de philosophie. Juste : que faire, dans quel ordre, avec quoi, d'ici quand.
+Tu identifies la prochaine action la plus petite possible qui crée du mouvement réel.
+Sois direct, lapidaire, structuré. Listes courtes. Délais précis.
+Réponds en français. Maximum 200 mots.`,
+  },
+];
+
+// ─── Prompt Chairman ──────────────────────────────────────────────────────
+const CHAIRMAN_SYSTEM = `Tu es le Chairman de l'AUTOPSIA Council — Guillaume Delmotte's personal strategic council.
+Ton rôle : synthétiser les analyses des 5 agents (Fossoyeur, Chirurgien, Prospecteur, Martien, Sergent) après leur peer review.
+
+Tu dois produire :
+1. **Points de convergence** : ce sur quoi les agents s'accordent (les vérités dures)
+2. **Points de tension** : là où ils s'affrontent (les zones d'incertitude réelle)
+3. **Angles morts collectifs** : ce qu'aucun agent n'a vu
+4. **Verdict actionnable** : recommandation claire, avec le niveau de confiance
+5. **Une seule prochaine action** : la plus importante à faire dans les 48h
+
+Sois synthétique, direct, sans flatterie. Maximum 300 mots. En français.
+Style : "flatterie avec un coup de sabre qui rééquilibre."`;
+
+const CLAUDE_MODEL = "claude-sonnet-4-6";
+
+function getApiKey() {
+  return localStorage.getItem("autopsia_council_api_key") || "";
+}
+
+function ApiKeyBanner({ apiKey, onSave }) {
+  const [value, setValue] = useState(apiKey);
+  const hasKey = !!apiKey;
+  return (
+    <div className={"api-banner" + (hasKey ? " has-key" : "")}>
+      <span>{hasKey ? "✓ Clé API Anthropic enregistrée" : "Clé API Anthropic :"}</span>
+      <input
+        type="password"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        placeholder="sk-ant-..."
+        autoComplete="off"
+      />
+      <button onClick={() => onSave(value.trim())}>Enregistrer</button>
+      <span style={{ opacity: 0.7 }}>Stockée localement dans votre navigateur</span>
+    </div>
+  );
+}
+
+// ─── Call API Anthropic ───────────────────────────────────────────────────
+async function callClaude(apiKey, systemPrompt, userMessage, maxTokens = 400) {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMessage }],
+    }),
+  });
+  if (!response.ok) {
+    let msg = `HTTP ${response.status}`;
+    try { const d = await response.json(); msg = d.error?.message || msg; } catch (_) {}
+    throw new Error(msg);
+  }
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+// ─── Composants UI ────────────────────────────────────────────────────────
+function AgentCard({ agent, opinion, isLoading, reviewScore }) {
+  return (
+    <div style={{
+      background: "rgba(10,10,15,0.8)",
+      border: `1px solid ${agent.color}44`,
+      borderRadius: "8px",
+      padding: "16px",
+      position: "relative",
+      boxShadow: isLoading ? `0 0 20px ${agent.glow}` : "none",
+      transition: "box-shadow 0.5s ease",
+    }}>
+      {/* Header agent */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+        <span style={{ fontSize: "22px", filter: `drop-shadow(0 0 6px ${agent.color})` }}>
+          {agent.symbol}
+        </span>
+        <div>
+          <div style={{ color: agent.color, fontWeight: "700", fontSize: "14px", letterSpacing: "0.08em" }}>
+            {agent.name}
+          </div>
+          <div style={{ color: "#666", fontSize: "11px", letterSpacing: "0.05em" }}>
+            {agent.role}
+          </div>
+        </div>
+        {reviewScore !== undefined && (
+          <div style={{
+            marginLeft: "auto",
+            background: agent.color + "22",
+            border: `1px solid ${agent.color}66`,
+            borderRadius: "4px",
+            padding: "2px 8px",
+            color: agent.color,
+            fontSize: "12px",
+            fontWeight: "700",
+          }}>
+            ★ {reviewScore}/5
+          </div>
+        )}
+      </div>
+
+      {/* Contenu */}
+      {isLoading ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#555" }}>
+          <div style={{
+            width: "8px", height: "8px", borderRadius: "50%",
+            background: agent.color,
+            animation: "pulse 1s infinite",
+          }} />
+          <span style={{ fontSize: "13px" }}>En délibération...</span>
+        </div>
+      ) : opinion ? (
+        <div style={{ color: "#C8C8D0", fontSize: "13px", lineHeight: "1.65", whiteSpace: "pre-wrap" }}>
+          {opinion}
+        </div>
+      ) : (
+        <div style={{ color: "#444", fontSize: "13px", fontStyle: "italic" }}>
+          En attente...
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhaseIndicator({ phase }) {
+  const phases = [
+    { id: 0, label: "Question" },
+    { id: 1, label: "Stage 1 — Opinions" },
+    { id: 2, label: "Stage 2 — Peer Review" },
+    { id: 3, label: "Stage 3 — Verdict" },
+  ];
+  return (
+    <div style={{ display: "flex", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+      {phases.map((p) => (
+        <div key={p.id} style={{
+          padding: "4px 12px",
+          borderRadius: "20px",
+          fontSize: "12px",
+          fontWeight: "600",
+          letterSpacing: "0.06em",
+          background: phase === p.id ? "#D4AF37" : phase > p.id ? "#1a2a1a" : "#0d0d14",
+          color: phase === p.id ? "#0d0d14" : phase > p.id ? "#4CAF50" : "#444",
+          border: phase === p.id ? "1px solid #D4AF37" : phase > p.id ? "1px solid #4CAF5044" : "1px solid #222",
+          transition: "all 0.3s ease",
+        }}>
+          {phase > p.id ? "✓ " : ""}{p.label}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── App principale ───────────────────────────────────────────────────────
+function AutopsiaCouncil() {
+  const [apiKey, setApiKey] = useState(getApiKey());
+  const [question, setQuestion] = useState("");
+  const [phase, setPhase] = useState(0);
+  const [opinions, setOpinions] = useState({});
+  const [reviews, setReviews] = useState({});
+  const [reviewScores, setReviewScores] = useState({});
+  const [verdict, setVerdict] = useState("");
+  const [loadingAgent, setLoadingAgent] = useState(null);
+  const [loadingVerdict, setLoadingVerdict] = useState(false);
+  const [error, setError] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState("");
+  const verdictRef = useRef(null);
+
+  function saveApiKey(key) {
+    localStorage.setItem("autopsia_council_api_key", key);
+    setApiKey(key);
+  }
+
+  async function runCouncil() {
+    if (!question.trim()) return;
+    if (!apiKey) {
+      setError("Entrez votre clé API Anthropic ci-dessus pour convoquer le Council.");
+      return;
+    }
+    setError(null);
+    setOpinions({});
+    setReviews({});
+    setReviewScores({});
+    setVerdict("");
+    setCurrentQuestion(question);
+
+    // ── STAGE 1 : Opinions individuelles ──────────────────────────────
+    setPhase(1);
+    const collectedOpinions = {};
+
+    for (const agent of AGENTS) {
+      setLoadingAgent(agent.id);
+      try {
+        const opinion = await callClaude(
+          apiKey,
+          agent.systemPrompt,
+          question,
+          350
+        );
+        collectedOpinions[agent.id] = opinion;
+        setOpinions({ ...collectedOpinions });
+      } catch (e) {
+        collectedOpinions[agent.id] = `[Erreur : ${e.message}]`;
+        setOpinions({ ...collectedOpinions });
+      }
+    }
+    setLoadingAgent(null);
+
+    // ── STAGE 2 : Peer Review anonymisé ───────────────────────────────
+    setPhase(2);
+    const collectedReviews = {};
+    const collectedScores = {};
+
+    for (const reviewer of AGENTS) {
+      setLoadingAgent(reviewer.id + "_review");
+
+      // Construire les opinions des autres (anonymisées)
+      const otherOpinions = AGENTS
+        .filter((a) => a.id !== reviewer.id)
+        .map((a, i) => `[Conseiller ${String.fromCharCode(65 + i)}] : ${collectedOpinions[a.id]}`)
+        .join("\n\n");
+
+      const reviewPrompt = `Tu es ${reviewer.name} (${reviewer.role}).
+
+Voici la question initiale : "${question}"
+
+Voici les analyses anonymisées de 4 autres conseillers :
+${otherOpinions}
+
+Ta propre analyse initiale était :
+"${collectedOpinions[reviewer.id]}"
+
+Maintenant :
+1. Identifie quelle analyse te semble la plus pertinente et pourquoi (1 phrase)
+2. Quelle analyse te semble la plus faible ou incomplète ? (1 phrase)
+3. Qu'est-ce que les autres ont vu que tu n'avais pas vu ? (1-2 phrases)
+4. Note chaque conseiller de 1 à 5 sur la pertinence (format : A:X, B:X, C:X, D:X)
+
+Reste dans ton personnage. Maximum 150 mots.`;
+
+      try {
+        const review = await callClaude(apiKey, reviewer.systemPrompt, reviewPrompt, 300);
+        collectedReviews[reviewer.id] = review;
+
+        // Parser les scores (format A:X, B:X, C:X, D:X)
+        const scoreMatch = review.match(/[A-D]:\s*([1-5])/g);
+        if (scoreMatch) {
+          collectedScores[reviewer.id] = scoreMatch;
+        }
+
+        setReviews({ ...collectedReviews });
+        setReviewScores({ ...collectedScores });
+      } catch (e) {
+        collectedReviews[reviewer.id] = `[Erreur review : ${e.message}]`;
+        setReviews({ ...collectedReviews });
+      }
+    }
+    setLoadingAgent(null);
+
+    // ── STAGE 3 : Chairman synthèse ───────────────────────────────────
+    setPhase(3);
+    setLoadingVerdict(true);
+
+    const fullContext = AGENTS.map((a) => `
+## ${a.name} (${a.role})
+
+**Opinion initiale :**
+${collectedOpinions[a.id]}
+
+**Peer review :**
+${collectedReviews[a.id] || "N/A"}
+`).join("\n---\n");
+
+    const chairmanPrompt = `Question soumise au Council AUTOPSIA : "${question}"
+
+Voici les opinions et peer reviews des 5 agents :
+
+${fullContext}
+
+Synthétise maintenant le verdict final du Council.`;
+
+    try {
+      const chairmanVerdict = await callClaude(apiKey, CHAIRMAN_SYSTEM, chairmanPrompt, 600);
+      setVerdict(chairmanVerdict);
+      setTimeout(() => verdictRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    } catch (e) {
+      setVerdict(`[Erreur Chairman : ${e.message}]`);
+    }
+    setLoadingVerdict(false);
+    setLoadingAgent(null);
+  }
+
+  const isRunning = phase > 0 && (loadingAgent !== null || loadingVerdict);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#080810",
+      color: "#E0E0E8",
+      fontFamily: "'SF Mono', 'Fira Code', 'Consolas', monospace",
+      padding: "32px 20px",
+      maxWidth: "900px",
+      margin: "0 auto",
+    }}>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.4); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        textarea:focus { outline: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0d0d14; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ marginBottom: "32px", borderBottom: "1px solid #1a1a2e", paddingBottom: "24px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "6px" }}>
+          <span style={{ color: "#D4AF37", fontSize: "22px", fontWeight: "900", letterSpacing: "0.12em" }}>
+            ΑΥΤΟΨΙΑ
+          </span>
+          <span style={{ color: "#444", fontSize: "14px" }}>|</span>
+          <span style={{ color: "#666", fontSize: "13px", letterSpacing: "0.1em" }}>COUNCIL</span>
+        </div>
+        <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.08em" }}>
+          5 agents · 3 stages · peer review · verdict chairman
+        </div>
+      </div>
+
+      <ApiKeyBanner apiKey={apiKey} onSave={saveApiKey} />
+
+      {error && (
+        <div style={{ padding: 14, marginBottom: 20, background: "rgba(220,80,40,0.1)", border: "1px solid rgba(220,80,40,0.3)", borderRadius: 6, fontSize: 13, color: "#ff9966" }}>
+          {error}
+        </div>
+      )}
+
+      {/* Input */}
+      <div style={{ marginBottom: "28px" }}>
+        <label style={{ display: "block", color: "#888", fontSize: "11px", letterSpacing: "0.1em", marginBottom: "10px" }}>
+          QUESTION AU COUNCIL
+        </label>
+        <textarea
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="Ex: Est-ce que je devrais accepter les 1,35M€ pour Maison Bello ?"
+          disabled={isRunning}
+          style={{
+            width: "100%",
+            minHeight: "90px",
+            background: "#0d0d18",
+            border: "1px solid #1e1e30",
+            borderRadius: "6px",
+            color: "#D8D8E8",
+            fontSize: "14px",
+            padding: "14px",
+            resize: "vertical",
+            lineHeight: "1.6",
+            boxSizing: "border-box",
+            opacity: isRunning ? 0.5 : 1,
+          }}
+        />
+        <button
+          onClick={runCouncil}
+          disabled={isRunning || !question.trim()}
+          style={{
+            marginTop: "12px",
+            padding: "12px 28px",
+            background: isRunning ? "#1a1a2e" : "#D4AF37",
+            color: isRunning ? "#444" : "#080810",
+            border: "none",
+            borderRadius: "5px",
+            fontFamily: "inherit",
+            fontWeight: "700",
+            fontSize: "13px",
+            letterSpacing: "0.1em",
+            cursor: isRunning ? "not-allowed" : "pointer",
+            transition: "all 0.2s ease",
+          }}
+        >
+          {isRunning ? "⚖ DÉLIBÉRATION EN COURS..." : "⚖ CONVOQUER LE COUNCIL"}
+        </button>
+      </div>
+
+      {/* Phase indicator */}
+      {phase > 0 && <PhaseIndicator phase={phase} />}
+
+      {/* Stage 1 — Opinions */}
+      {phase >= 1 && (
+        <div style={{ marginBottom: "32px", animation: "fadeIn 0.4s ease" }}>
+          <div style={{ color: "#D4AF37", fontSize: "11px", letterSpacing: "0.15em", marginBottom: "16px", fontWeight: "700" }}>
+            STAGE 1 — OPINIONS INDIVIDUELLES
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "12px" }}>
+            {AGENTS.map((agent) => (
+              <AgentCard
+                key={agent.id}
+                agent={agent}
+                opinion={opinions[agent.id]}
+                isLoading={loadingAgent === agent.id}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Stage 2 — Peer Reviews */}
+      {phase >= 2 && Object.keys(reviews).length > 0 && (
+        <div style={{ marginBottom: "32px", animation: "fadeIn 0.4s ease" }}>
+          <div style={{ color: "#8E44AD", fontSize: "11px", letterSpacing: "0.15em", marginBottom: "16px", fontWeight: "700" }}>
+            STAGE 2 — PEER REVIEW CROISÉE
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "12px" }}>
+            {AGENTS.map((agent) => (
+              <AgentCard
+                key={agent.id + "_review"}
+                agent={agent}
+                opinion={reviews[agent.id]}
+                isLoading={loadingAgent === agent.id + "_review"}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Stage 3 — Verdict Chairman */}
+      {(loadingVerdict || verdict) && (
+        <div ref={verdictRef} style={{ animation: "fadeIn 0.5s ease" }}>
+          <div style={{ color: "#D4AF37", fontSize: "11px", letterSpacing: "0.15em", marginBottom: "16px", fontWeight: "700" }}>
+            STAGE 3 — VERDICT DU CHAIRMAN
+          </div>
+          <div style={{
+            background: "linear-gradient(135deg, rgba(10,10,18,0.95) 0%, rgba(16,12,8,0.95) 100%)",
+            border: "1px solid #D4AF3766",
+            borderRadius: "8px",
+            padding: "24px",
+            boxShadow: loadingVerdict ? "0 0 40px rgba(212,175,55,0.15)" : "0 0 20px rgba(212,175,55,0.08)",
+            transition: "box-shadow 0.5s ease",
+          }}>
+            {loadingVerdict ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "#D4AF37" }}>
+                <div style={{
+                  width: "10px", height: "10px", borderRadius: "50%",
+                  background: "#D4AF37",
+                  animation: "pulse 1s infinite",
+                }} />
+                <span style={{ fontSize: "14px", letterSpacing: "0.05em" }}>
+                  Le Chairman synthétise les délibérations...
+                </span>
+              </div>
+            ) : (
+              <div style={{
+                color: "#E8E0C8",
+                fontSize: "14px",
+                lineHeight: "1.75",
+                whiteSpace: "pre-wrap",
+              }}>
+                {verdict}
+              </div>
+            )}
+          </div>
+
+          {/* Bouton reset */}
+          {verdict && !loadingVerdict && (
+            <button
+              onClick={() => {
+                setPhase(0);
+                setOpinions({});
+                setReviews({});
+                setReviewScores({});
+                setVerdict("");
+                setQuestion("");
+                setCurrentQuestion("");
+              }}
+              style={{
+                marginTop: "16px",
+                padding: "8px 20px",
+                background: "transparent",
+                color: "#555",
+                border: "1px solid #222",
+                borderRadius: "4px",
+                fontFamily: "inherit",
+                fontSize: "12px",
+                cursor: "pointer",
+                letterSpacing: "0.08em",
+              }}
+            >
+              ↺ Nouvelle question
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Footer */}
+      <div style={{
+        marginTop: "48px",
+        paddingTop: "16px",
+        borderTop: "1px solid #111",
+        color: "#333",
+        fontSize: "10px",
+        letterSpacing: "0.08em",
+        display: "flex",
+        justifyContent: "space-between",
+      }}>
+        <span>ΑΥΤΟΨΙΑ · Council System v1</span>
+        <span>Karpathy methodology · 5 agents · Claude Sonnet</span>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<AutopsiaCouncil />);
+</script>
+</body>
+</html>
