@@ -7,9 +7,21 @@ Voir [constitution.md](constitution.md) pour la charte fondatrice : mandat, comp
 ## Les 13 agents
 | # | Agent / rôle | Angle apporté |
 |---|---|---|
-| 1 | *(à compléter)* | |
-| 2 | *(à compléter)* | |
-| ... | | |
+| 1 | Stratège | Vision systémique, position concurrentielle, timing |
+| 2 | Financier | P&L, cash flow, ROI, structuration patrimoniale |
+| 3 | Juriste | Plaidoirie, droit des affaires, démontage d'arguments, force de conviction |
+| 4 | Marketeur | Positionnement, brand, acquisition, désirabilité |
+| 5 | Ops / Exécution | Faisabilité, process, ressources, délais réels |
+| 6 | Psychologue | Dynamiques humaines, décision, biais, comportements |
+| 7 | Innovateur | Rupture, tendances, ce qui n'existe pas encore |
+| 8 | Contradicteur | Avocat du diable, failles, scénarios d'échec |
+| 9 | Politicien | Rapport de force, acceptabilité, jeu des acteurs, institutions |
+| 10 | Fiscaliste International | Résidence fiscale, conventions internationales, optimisation multi-juridictions (Hong Kong, Luxembourg, France) |
+| 11 | Conseiller Familial | Impact sur les proches, confiance, équilibre vie privée / business |
+| 12 | Stratège de Transmission | Héritage patrimonial et intellectuel, ce qui survit après Guillaume, horizon multi-générationnel |
+| 13 | Arbitre | Synthèse finale, décision, verdict actionnable |
+
+Sièges 1–9 et 13 (Arbitre) implémentés dans `conseil-agents/index.html`. Sièges 10–12 sont définis ici mais pas encore implémentés (voir [constitution.md](constitution.md), Article 2).
 
 ## Comment convoquer le conseil
 *(à compléter — processus, prompt type)*

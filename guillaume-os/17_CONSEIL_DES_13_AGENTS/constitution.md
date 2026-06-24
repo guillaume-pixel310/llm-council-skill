@@ -10,7 +10,7 @@ Le Conseil n'a pas d'autorité décisionnelle. Il éclaire. La décision finale 
 
 ## Article 2 — Composition
 
-Dix agents sont implémentés à ce jour dans `conseil-agents/index.html` : neuf positions disciplinaires + un Arbitre.
+La composition cible à 13 sièges est définie ci-dessous. Dix d'entre eux (1 à 9 et l'Arbitre) sont implémentés à ce jour dans `conseil-agents/index.html` ; les trois derniers (Fiscaliste International, Conseiller Familial, Stratège de Transmission) sont définis ici mais pas encore implémentés — le Conseil opère donc à 10 en pratique tant que l'implémentation n'a pas suivi.
 
 | # | Agent | Angle apporté |
 |---|---|---|
@@ -23,9 +23,12 @@ Dix agents sont implémentés à ce jour dans `conseil-agents/index.html` : neuf
 | 7 | Innovateur | Rupture, tendances, ce qui n'existe pas encore |
 | 8 | Contradicteur | Avocat du diable, failles, scénarios d'échec |
 | 9 | Politicien | Rapport de force, acceptabilité, jeu des acteurs, institutions |
-| 10 | Arbitre | Synthèse finale, décision, verdict actionnable |
+| 10 | Fiscaliste International | Résidence fiscale, conventions internationales, optimisation multi-juridictions (Hong Kong, Luxembourg, France) |
+| 11 | Conseiller Familial | Impact sur les proches, confiance, équilibre vie privée / business |
+| 12 | Stratège de Transmission | Héritage patrimonial et intellectuel, ce qui survit après Guillaume, horizon multi-générationnel |
+| 13 | Arbitre | Synthèse finale, décision, verdict actionnable |
 
-Le nom de cette section ("13 Agents") anticipe trois sièges supplémentaires non encore définis. Tant qu'ils ne sont pas pourvus, le Conseil opère légitimement à 10. Compléter la table des agents ci-dessus reste la tâche ouverte de cette section.
+Implémenter les trois nouveaux sièges dans `conseil-agents/index.html` (persona, prompt, position dans l'ordre de passage avant l'Arbitre) reste la tâche ouverte de cette section, conformément à l'Article 8.
 
 ## Article 3 — Processus de convocation
 
