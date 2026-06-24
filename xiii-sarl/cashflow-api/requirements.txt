@@ -2,3 +2,5 @@ fastapi
 pydantic>=2
 uvicorn
 pandas
+openai
+anthropic
