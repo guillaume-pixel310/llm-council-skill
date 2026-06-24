@@ -23,5 +23,8 @@ Each `spec.md` covers one feature and follows this shape:
 | Legal: Review Contract | [legal-review-contract/spec.md](legal-review-contract/spec.md) | `legal/review-contract/` |
 | Legal: Meeting Briefing | [legal-meeting-briefing/spec.md](legal-meeting-briefing/spec.md) | `legal/meeting-briefing/` |
 | Conseil des Agents | [conseil-agents/spec.md](conseil-agents/spec.md) | `conseil-agents/` |
+| Astro Journal | [astro-journal/spec.md](astro-journal/spec.md) | `astro-journal/` |
+| XIII SARL Pitch Deck | [xiii-sarl-pitch-deck/spec.md](xiii-sarl-pitch-deck/spec.md) | `xiii-sarl/` |
+| XIII SARL Cashflow API | [xiii-sarl-cashflow-api/spec.md](xiii-sarl-cashflow-api/spec.md) | `xiii-sarl/cashflow-api/` |
 
 When adding a new feature, add its `spec.md` here and list it in the table above.
