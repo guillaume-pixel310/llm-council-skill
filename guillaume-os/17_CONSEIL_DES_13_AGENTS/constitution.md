@@ -10,7 +10,7 @@ Le Conseil n'a pas d'autorité décisionnelle. Il éclaire. La décision finale 
 
 ## Article 2 — Composition
 
-La composition cible à 13 sièges est définie ci-dessous. Dix d'entre eux (1 à 9 et l'Arbitre) sont implémentés à ce jour dans `conseil-agents/index.html` ; les trois derniers (Fiscaliste International, Conseiller Familial, Stratège de Transmission) sont définis ici mais pas encore implémentés — le Conseil opère donc à 10 en pratique tant que l'implémentation n'a pas suivi.
+La composition à 13 sièges est définie ci-dessous et entièrement implémentée dans `conseil-agents/index.html`.
 
 | # | Agent | Angle apporté |
 |---|---|---|
@@ -28,7 +28,7 @@ La composition cible à 13 sièges est définie ci-dessous. Dix d'entre eux (1 �
 | 12 | Stratège de Transmission | Héritage patrimonial et intellectuel, ce qui survit après Guillaume, horizon multi-générationnel |
 | 13 | Arbitre | Synthèse finale, décision, verdict actionnable |
 
-Implémenter les trois nouveaux sièges dans `conseil-agents/index.html` (persona, prompt, position dans l'ordre de passage avant l'Arbitre) reste la tâche ouverte de cette section, conformément à l'Article 8.
+Toute évolution future de la composition doit être reflétée ici en premier, avant d'être implémentée dans `conseil-agents/index.html`, conformément à l'Article 8.
 
 ## Article 3 — Processus de convocation
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A standalone, client-side multi-agent debate tool: disciplinary personas argue a question in sequence, then an Arbitre (synthesizer) produces consensus, tensions, blind spots, and an actionable recommendation. Implements the operational side of the charter defined in `guillaume-os/17_CONSEIL_DES_13_AGENTS/constitution.md`. The constitution now defines all 13 seats; 9 disciplines + the Arbitre are currently implemented.
+A standalone, client-side multi-agent debate tool: disciplinary personas argue a question in sequence, then an Arbitre (synthesizer) produces consensus, tensions, blind spots, and an actionable recommendation. Implements the operational side of the charter defined in `guillaume-os/17_CONSEIL_DES_13_AGENTS/constitution.md`. All 13 seats defined in the constitution are now implemented: 12 disciplines + the Arbitre.
 
 ## Trigger
 
@@ -15,7 +15,7 @@ Manual — the user opens `conseil-agents/index.html` in a browser and submits a
 
 ## Outputs
 
-Sequential persona responses rendered in the UI, in order: Stratège, Financier, Juriste, Marketeur, Ops/Exécution, Psychologue, Innovateur, Contradicteur, Politicien, then the Arbitre's synthesis (consensus, unresolved tensions, collective blind spots, prioritized recommendation, main risk to watch).
+Sequential persona responses rendered in the UI, in order: Stratège, Financier, Juriste, Marketeur, Ops/Exécution, Psychologue, Innovateur, Contradicteur, Politicien, Fiscaliste International, Conseiller Familial, Stratège de Transmission, then the Arbitre's synthesis (consensus, unresolved tensions, collective blind spots, prioritized recommendation, main risk to watch).
 
 ## Key files
 
@@ -25,11 +25,10 @@ Sequential persona responses rendered in the UI, in order: Stratège, Financier,
 
 - Advisory only — per the constitution, the Council has no decision authority; it informs, the human decides
 - The Contradicteur has a standing mandate to disagree — its persona prompt must not be softened to seek consensus
-- Implemented agent count is currently 10 (9 disciplines + Arbitre); the constitution now defines all 13 seats (Article 2), with 3 (Fiscaliste International, Conseiller Familial, Stratège de Transmission) defined but not yet implemented here — implementing them must not skip ahead of further constitution changes, per Article 8
+- Implemented agent count is now 13 (12 disciplines + Arbitre), matching all seats defined in the constitution (Article 2); any future composition change must be reflected in the constitution first, before being implemented here, per Article 8
 - No server component, no persistence of debate history beyond what the constitution's README tracks manually in its consultation-history table
 - API key handling is client-side only (`localStorage`) — there is no backend proxy or key rotation
 
 ## Open questions
 
-- 3 of the 13 defined seats (Fiscaliste International, Conseiller Familial, Stratège de Transmission) are not yet implemented in `conseil-agents/index.html` — implementing them is the open task in `guillaume-os/17_CONSEIL_DES_13_AGENTS/constitution.md`, Article 2
 - No automated tests cover this file — it has no eval suite, unlike `llm-council`

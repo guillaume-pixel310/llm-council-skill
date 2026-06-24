@@ -21,7 +21,7 @@ Voir [constitution.md](constitution.md) pour la charte fondatrice : mandat, comp
 | 12 | Stratège de Transmission | Héritage patrimonial et intellectuel, ce qui survit après Guillaume, horizon multi-générationnel |
 | 13 | Arbitre | Synthèse finale, décision, verdict actionnable |
 
-Sièges 1–9 et 13 (Arbitre) implémentés dans `conseil-agents/index.html`. Sièges 10–12 sont définis ici mais pas encore implémentés (voir [constitution.md](constitution.md), Article 2).
+Les 13 sièges sont implémentés dans `conseil-agents/index.html` (voir [constitution.md](constitution.md), Article 2).
 
 ## Comment convoquer le conseil
 *(à compléter — processus, prompt type)*
