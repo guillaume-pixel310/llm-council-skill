@@ -2,6 +2,8 @@
 
 > But : décrire les 13 agents-conseillers (personas) utilisés pour challenger les décisions, et l'historique de leurs consultations.
 
+Voir [constitution.md](constitution.md) pour la charte fondatrice : mandat, composition, processus de convocation, règles du débat.
+
 ## Les 13 agents
 | # | Agent / rôle | Angle apporté |
 |---|---|---|

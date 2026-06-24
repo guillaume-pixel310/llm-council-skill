@@ -1,0 +1,62 @@
+name: Evals
+
+on:
+  push:
+    paths:
+      - "llm-council/**"
+      - "legal/**"
+      - ".github/workflows/evals.yml"
+  pull_request:
+    paths:
+      - "llm-council/**"
+      - "legal/**"
+      - ".github/workflows/evals.yml"
+
+jobs:
+  run-evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run llm-council evals
+        run: python3 llm-council/scripts/run_evals.py --verbose
+
+      - name: Verify packaged skill ZIPs are in sync with source
+        run: |
+          python3 - <<'EOF'
+          import zipfile, os, sys
+
+          def rebuild(src_dir, zip_path):
+              tmp_path = zip_path + ".check"
+              with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_DEFLATED) as zf:
+                  for root, _, files in os.walk(src_dir):
+                      for f in sorted(files):
+                          fp = os.path.join(root, f)
+                          zf.write(fp, os.path.relpath(fp, src_dir))
+
+              def contents(path):
+                  with zipfile.ZipFile(path) as zf:
+                      return {n: zf.read(n) for n in sorted(zf.namelist())}
+
+              current = contents(zip_path)
+              rebuilt = contents(tmp_path)
+              os.remove(tmp_path)
+              return current == rebuilt
+
+          ok = True
+          for src, zip_path in [("llm-council", "llm-council.skill"), ("legal", "legal.skill")]:
+              if rebuild(src, zip_path):
+                  print(f"[ok] {zip_path} matches {src}/")
+              else:
+                  print(f"[FAIL] {zip_path} is out of sync with {src}/ — rebuild it (see CLAUDE.md)")
+                  ok = False
+
+          sys.exit(0 if ok else 1)
+          EOF
