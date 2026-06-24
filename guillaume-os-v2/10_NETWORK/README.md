@@ -6,10 +6,10 @@
 - *(à compléter — cercle proche, élargi, aspirationnel)*
 
 ## Contacts stratégiques
-| Nom | Rôle / domaine | Coordonnées | Contexte de la relation |
-|---|---|---|---|
+| Nom | Fonction | Influence | Intérêt commun | Dernier contact | Prochaine action |
+|---|---|---|---|---|---|
 
-> Note : préférer un gestionnaire de coordonnées dédié (vCard, CRM) pour les données sensibles ; ce fichier peut référencer sans dupliquer les détails confidentiels.
+> Note : préférer un gestionnaire de coordonnées dédié (vCard, CRM) pour les coordonnées sensibles ; ce tableau référence la relation sans dupliquer les détails confidentiels.
 
 ## Lien
 Voir [19_DREAMS](../19_DREAMS/README.md) pour les cibles à approcher (Dream 100).
