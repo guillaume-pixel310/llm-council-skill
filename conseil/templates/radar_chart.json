@@ -1,0 +1,30 @@
+{
+  "title": "Conseil — évaluation par axe",
+  "question": "[reformulation de la question soumise au Conseil]",
+  "axes": [
+    "Stratégie",
+    "Finance",
+    "Juridique",
+    "Marché & Communication",
+    "Exécution",
+    "Risque"
+  ],
+  "scale": { "min": 0, "max": 10 },
+  "datasets": [
+    {
+      "label": "Conviction du Conseil",
+      "description": "Score de conviction moyen par axe (0 = forte réserve, 10 = forte conviction favorable)",
+      "scores": [7, 6, 5, 6, 4, 5]
+    },
+    {
+      "label": "Avocat du Diable",
+      "description": "Scores du scénario le plus défavorable plausible par axe",
+      "scores": [4, 4, 3, 4, 3, 2]
+    },
+    {
+      "label": "Optimiste",
+      "description": "Scores du scénario haussier plausible par axe",
+      "scores": [9, 8, 7, 8, 6, 7]
+    }
+  ]
+}
