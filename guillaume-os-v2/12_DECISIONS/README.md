@@ -3,8 +3,8 @@
 > But : registre des décisions majeures, leur contexte, raisonnement et résultat.
 
 ## Registre
-| Date | Décision | Contexte | Raisonnement | Résultat |
-|---|---|---|---|---|
+| Date | Décision | Contexte | Options | Choix | Raisonnement | Risques | Résultat réel | Leçons |
+|---|---|---|---|---|---|---|---|---|
 
 ## Décisions en attente
 - *(à compléter — renvoi [00_CORE](../00_CORE/README.md))*
