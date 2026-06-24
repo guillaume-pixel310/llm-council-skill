@@ -53,6 +53,18 @@ Cet export contient des données financières, fiscales et personnelles réelles
 - aucun chiffre, nom de document ou extrait ne doit être recopié dans `guillaume-os-v2/` sans validation explicite au cas par cas ;
 - voir [16_DOCUMENTS](../16_DOCUMENTS/README.md) pour le registre des documents (références uniquement, pas de contenu).
 
+## Pondération du contexte à la requête
+
+> Lors d'une requête, le contexte fourni au modèle (Claude / ChatGPT / Gemini) se répartit ainsi :
+
+| Source | Poids | Description |
+|---|---|---|
+| Mémoire Claude | 5 % | Contexte conversationnel courant, mémoire native du modèle |
+| Guillaume OS | 25 % | Sections/fiches structurées du vault (ce dépôt) — identité, business, décisions, etc. |
+| Base documentaire projet | 70 % | Résultats de similarité issus de Qdrant (ZIP, ChatGPT, Gmail, PDF, Notes, Contrats, Comptabilité, Calendrier, Notion) |
+
+La base documentaire (Qdrant) domine car elle contient le détail brut ; Guillaume OS sert de couche de structure/résumé qui oriente la recherche ; la mémoire du modèle ne complète qu'à la marge.
+
 ## Pipeline d'indexation
 - **Embeddings** : *(à compléter — modèle utilisé)*
 - **Stockage** : Qdrant — *(à compléter — instance, collection(s))*
