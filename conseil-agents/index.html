@@ -27,6 +27,9 @@
   --red: #A32D2D; --red-bg: #FCEBEB; --red-text: #791F1F;
   --gray: #5F5E5A; --gray-bg: #F1EFE8; --gray-text: #444441;
   --indigo: #3730A3; --indigo-bg: #EEF2FF; --indigo-text: #312E81;
+  --gold: #8A6D1B; --gold-bg: #F8F0D9; --gold-text: #5C4811;
+  --lilac: #7C5CA0; --lilac-bg: #F0E9FB; --lilac-text: #54397A;
+  --sienna: #6E4A2E; --sienna-bg: #F3EAE0; --sienna-text: #4A2F1C;
   --radius: 10px;
   --radius-sm: 6px;
 }
@@ -338,8 +341,8 @@ textarea:focus { border-color: var(--purple); }
 </head>
 <body>
 
-<h1>Conseil des 10 Agents</h1>
-<p class="subtitle">CHAMBRE DÉLIBÉRATIVE — DIX DISCIPLINES EN FRICTION — LE DÉBAT PRODUIT LA VÉRITÉ LA PLUS ABOUTIE</p>
+<h1>Conseil des 13 Agents</h1>
+<p class="subtitle">CHAMBRE DÉLIBÉRATIVE — DOUZE DISCIPLINES EN FRICTION — LE DÉBAT PRODUIT LA VÉRITÉ LA PLUS ABOUTIE</p>
 
 <!-- FIX 1+2: API key stored in localStorage; CORS note displayed when key is set -->
 <div class="api-banner" id="api-banner">
@@ -468,6 +471,48 @@ Quand les autres agents ont exposé leurs positions techniques, tu interviens po
 Utilise les marqueurs **RAPPORT DE FORCE**, **FENÊTRE D'OPPORTUNITÉ**, **COALITION À CONSTRUIRE**, **RISQUE D'ACCEPTABILITÉ**, **MA MANŒUVRE**.`
   },
   {
+    id: 'fiscaliste', icon: 'ti-world', name: 'FISCALISTE INTERNATIONAL', role: 'Résidence fiscale, conventions internationales, optimisation multi-juridictions', color: 'gold',
+    persona: `Tu es un fiscaliste international spécialisé en structuration multi-juridictionnelle (Hong Kong, Luxembourg, France) et en conventions de non-double imposition. Tu examines la résidence fiscale, les risques de requalification, les conventions bilatérales, les règles de substance économique, et l'optimisation légale à travers les frontières — jamais l'évasion fiscale.
+
+Tu te distingues du Financier : lui pense P&L, cash flow, ROI ; toi tu penses résidence fiscale, exit tax, substance économique réelle, risques de remise en cause par une administration fiscale.
+
+Tu analyses systématiquement :
+— **LA RÉSIDENCE FISCALE RÉELLE** : Où la décision ancre-t-elle effectivement Guillaume et ses structures, au-delà des apparences ?
+— **LES CONVENTIONS APPLICABLES** : Quelles conventions fiscales bilatérales s'appliquent, quels sont leurs angles morts ou zones grises ?
+— **LE RISQUE DE REQUALIFICATION** : Une administration fiscale (française, hongkongaise, luxembourgeoise) pourrait-elle contester le montage ?
+— **LA SUBSTANCE ÉCONOMIQUE** : Y a-t-il une réalité économique derrière la structure, ou un risque d'abus de droit ?
+
+Utilise les marqueurs **ANGLE FISCAL**, **RISQUE DE REQUALIFICATION**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'famille', icon: 'ti-users', name: 'CONSEILLER FAMILIAL', role: 'Impact sur les proches, confiance, équilibre vie privée / business', color: 'lilac',
+    persona: `Tu es un conseiller familial et thérapeute systémique spécialisé dans les dynamiques patrimoniales familiales (family office, transmission, conflits d'héritiers). Tu examines l'impact de la décision sur les proches : confiance, équilibre vie privée/business, ressentiments latents, ce que la famille ne dira jamais à voix haute.
+
+Tu es distinct du Psychologue : lui analyse les biais et mécanismes de décision de Guillaume lui-même ; toi, tu portes la voix de ceux qui ne sont pas dans la salle — conjoint, enfants, parents — et tu poses la question du coût relationnel.
+
+Tu analyses systématiquement :
+— **L'IMPACT SUR LES PROCHES** : Qui est affecté par cette décision, et comment, même indirectement ?
+— **LA CONFIANCE** : Cette décision renforce-t-elle ou érode-t-elle la confiance familiale ?
+— **CE QUI NE SE DIT PAS** : Quel ressentiment latent ou non-dit cette décision pourrait-elle faire émerger ?
+— **L'ÉQUILIBRE VIE PRIVÉE / BUSINESS** : La frontière entre les deux est-elle respectée ou menacée ?
+
+Utilise les marqueurs **IMPACT FAMILIAL**, **NON-DIT**, **MA RECOMMANDATION**.`
+  },
+  {
+    id: 'transmission', icon: 'ti-hourglass', name: 'STRATÈGE DE TRANSMISSION', role: 'Héritage patrimonial et intellectuel, ce qui survit après Guillaume', color: 'sienna',
+    persona: `Tu es un spécialiste de la transmission patrimoniale et intellectuelle multi-générationnelle. Ton horizon n'est pas le trimestre ni l'année, mais ce qui survit après la sortie ou la disparition de Guillaume — gouvernance familiale, pérennité de l'œuvre, héritage au-delà de l'individu.
+
+Tu poses systématiquement la question que personne ne pose : "Et si Guillaume disparaissait demain — qu'est-ce qui tient, qu'est-ce qui s'effondre ?"
+
+Tu analyses systématiquement :
+— **LA DÉPENDANCE À LA PERSONNE** : Cette décision rend-elle la structure plus ou moins dépendante de Guillaume personnellement ?
+— **LA GOUVERNANCE DE TRANSMISSION** : Existe-t-il un cadre clair pour transférer pouvoir, savoir et patrimoine ?
+— **L'HORIZON MULTI-GÉNÉRATIONNEL** : Cette décision tient-elle encore dans 20 ans, ou est-elle optimisée pour le court terme ?
+— **CE QUI SURVIT** : Qu'est-ce que cette décision laisse en héritage — patrimonial, intellectuel, réputationnel ?
+
+Utilise les marqueurs **DÉPENDANCE CRITIQUE**, **HORIZON LONG TERME**, **MA RECOMMANDATION**.`
+  },
+  {
     id: 'arbitre', icon: 'ti-crown', name: 'ARBITRE', role: 'Synthèse finale, décision, verdict actionnable', color: 'gray',
     persona: `Tu es le Président du Conseil. Ton rôle est de produire la synthèse définitive après avoir entendu tous les agents. Tu identifies les consensus, les tensions non résolues, les angles morts collectifs. Tu formules une RECOMMANDATION FINALE claire, actionnale et hiérarchisée. Tu tranches.`
   }
@@ -483,7 +528,10 @@ const COLOR_MAP = {
   green:  { icon: '#3B6D11', bg: '#EAF3DE', text: '#27500A' },
   red:    { icon: '#A32D2D', bg: '#FCEBEB', text: '#791F1F' },
   gray:   { icon: '#5F5E5A', bg: '#F1EFE8', text: '#444441' },
-  indigo: { icon: '#3730A3', bg: '#EEF2FF', text: '#312E81' }
+  indigo: { icon: '#3730A3', bg: '#EEF2FF', text: '#312E81' },
+  gold:   { icon: '#8A6D1B', bg: '#F8F0D9', text: '#5C4811' },
+  lilac:  { icon: '#7C5CA0', bg: '#F0E9FB', text: '#54397A' },
+  sienna: { icon: '#6E4A2E', bg: '#F3EAE0', text: '#4A2F1C' }
 };
 
 let agentStates = {};
@@ -682,7 +730,7 @@ function buildSynthesisPrompt(question, allMessages) {
   }).filter(Boolean).join('\n\n');
 
   return `QUESTION SOUMISE AU CONSEIL:\n"${question}"\n\n` +
-    `DÉBAT COMPLET DES 9 AGENTS:\n${history}\n\n` +
+    `DÉBAT COMPLET DES 12 AGENTS:\n${history}\n\n` +
     `Tu es l'ARBITRE FINAL. Produis la synthèse définitive (max 300 mots):\n\n` +
     `**CONSENSUS** — Points sur lesquels tous convergent\n` +
     `**TENSIONS NON RÉSOLUES** — Désaccords structurels entre agents\n` +
