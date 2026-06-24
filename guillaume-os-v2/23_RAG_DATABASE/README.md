@@ -25,7 +25,7 @@ Claude / ChatGPT / Gemini
 ## Index des sources
 | Source | Type de contenu | Format | Fréquence de mise à jour |
 |---|---|---|---|
-| ZIP | *(à compléter — archive de quoi ?)* | | |
+| ZIP | Export officiel ChatGPT (Réglages → Contrôles des données → Exporter) | `conversations*.json` + `shared_conversations.json` + assets (jpeg/pdf/wav/pptx/png/xlsx) | ponctuel, à ré-exporter périodiquement |
 | ChatGPT | Historique de conversations | export JSON | |
 | Claude | Historique de conversations | export JSON | |
 | Gmail | E-mails | API / export | |
@@ -38,6 +38,20 @@ Claude / ChatGPT / Gemini
 
 ## Métadonnées à maintenir
 - *(à compléter — tags, dates, sensibilité, source d'origine)*
+
+## Exports reçus (registre, métadonnées uniquement)
+
+> Le contenu brut de ces exports ne doit **jamais** être committé dans ce dépôt git — il alimente directement le pipeline Embeddings → Qdrant. Seules des métadonnées agrégées sont consignées ici.
+
+| Export | Date de réception | Période couverte | Volume | Contenu (types) | Statut indexation |
+|---|---|---|---|---|---|
+| ChatGPT (export officiel) | 2026-06-24 | 2025-10-24 → 2026-06-17 | 101 conversations (8 partagées) + 91 fichiers joints | jpeg (68), pdf (13), wav (2), pptx (2), png (2), xlsx (1), zip (1), md (1) — inclut bilans comptables, business plans, projets immobiliers, documents fiscaux | non indexé (en attente pipeline Qdrant) |
+
+## Sensibilité — note
+Cet export contient des données financières, fiscales et personnelles réelles (bilans de sociétés, montages patrimoniaux, documents d'identité, photos). À ce titre :
+- traitement réservé au pipeline Embeddings → Qdrant (hors git) ;
+- aucun chiffre, nom de document ou extrait ne doit être recopié dans `guillaume-os-v2/` sans validation explicite au cas par cas ;
+- voir [16_DOCUMENTS](../16_DOCUMENTS/README.md) pour le registre des documents (références uniquement, pas de contenu).
 
 ## Pipeline d'indexation
 - **Embeddings** : *(à compléter — modèle utilisé)*
